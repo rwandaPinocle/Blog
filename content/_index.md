@@ -6,4 +6,4 @@ Andrew's Notes
 
 [AI Bookmarks]({{< ref "ai-bookmarks" >}})
 
-[AI Articles]({{< ref "ai-articles" >}})
+[Articles]({{< ref "articles" >}})
