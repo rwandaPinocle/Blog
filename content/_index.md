@@ -4,6 +4,6 @@ Andrew's Notes
 
 [Deep Learning Reading List]({{< ref "deep-learning-reading-list" >}})
 
-[AI Bookmarks]({{< ref "ai-bookmarks" >}})
+[Software]({{< ref "software" >}})
 
 [Articles]({{< ref "articles" >}})

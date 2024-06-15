@@ -21,6 +21,13 @@ Interpreting individual activations inside of LLMs
 
 [Lessons from a year of building with LLMs](https://applied-llms.org/)
 
+Training on a single gpu
+ - https://huggingface.co/docs/transformers/en/perf_train_gpu_one
+ - https://magazine.sebastianraschka.com/p/understanding-large-language-models
+ - https://towardsdatascience.com/editing-text-in-images-with-ai-03dee75d8b9c
+ - https://github.com/Mozilla-Ocho/llamafile
+
+
 # Graphics
 
 [Exponentially Better Rotations](https://thenumb.at/Exponential-Rotations/):
