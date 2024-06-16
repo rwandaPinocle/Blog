@@ -41,7 +41,7 @@ An MLP based architecture that matches transformer performance
 [CLIP.cpp](https://github.com/monatis/clip.cpp/tree/main):
 A C++ implementation of CLIP
 
-# GPU Computing 
+# GPU/Multithreaded Computing 
 
 [NVIDIA Warp](https://github.com/NVIDIA/warp): 
 NVIDIA's Python framework for compiling Python code into compute kernels. 
@@ -49,8 +49,12 @@ NVIDIA's Python framework for compiling Python code into compute kernels.
 [Triton](https://github.com/triton-lang/triton):
 OpenAI's Python framework for compiling Python code into compute kernels.
 Uses an MLIR backend.
+Supports CUDA.
 
 [Taichi](https://github.com/taichi-dev/taichi):
 Python framework for compiling Python code into compute kernels.
-Supports CUDA, Vulkan, AMD
+Has modules for physics sims, NERFs, differentiable programming, 
+Supports CUDA, Vulkan, AMD.
 
+[Pythran](https://pythran.readthedocs.io/en/latest/):
+A Python tool that compiles Python code into multithreaded and SIMD modules.
