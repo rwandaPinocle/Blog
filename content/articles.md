@@ -5,6 +5,10 @@ draft: false
 ---
 # Machine Learning and Artificial Intelligence
 
+[Refusal in Language Models is Mediated by a Single Direction](https://arxiv.org/abs/2406.11717):
+The authors find a one dimensional subspace in the activation space of multiple LLMs that controls refusal.
+Subtracting it causes the models to comply with harmful instructions and adding it causes it to refuse harmless instructions.
+
 [LLama.mojo benchmarks](https://engiware.com/benchmark/llama2-ports-extensive-benchmarks-mac-m1-max.html):
 Llama2.mojo is on par with Llama.cpp single threaded and beats Llama.c and Llama.cpp on multithreaded.
 
