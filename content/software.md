@@ -17,6 +17,8 @@ Open LLM 70B params, beats Lllama 3
 
 # Deep learning
 
+[Stable Diffusion from Scratch](https://github.com/Animadversio/DiffusionFromScratch): A Harvard tutorial on Stable Diffusion
+
 [Wonnx](https://github.com/webonnx/wonnx):
 Onnx runtime for WebGPU
 
