@@ -17,6 +17,9 @@ Open LLM 70B params, beats Lllama 3
 
 # Deep learning
 
+[MAX Engine](https://docs.modular.com/max/engine):
+Modular's runtime for serving models. Support Pytorch, Tensorflow, and ONNX models on CPU.
+
 [Stable Diffusion from Scratch](https://github.com/Animadversio/DiffusionFromScratch): A Harvard tutorial on Stable Diffusion
 
 [Wonnx](https://github.com/webonnx/wonnx):
