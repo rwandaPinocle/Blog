@@ -41,7 +41,7 @@ These days I find Pytorch to be more popular.
 [ONNX](https://github.com/onnx/onnx):
 ONNX is tool for deploying models on platforms that aren't well supported by Pytorch and Tensorflow, such as C++, Java, JS, Mobile, and Browsers.
 
-# Misc 
+# Misc
 
 [How I got into deep learning, by Vikas Paruchuri](https://www.vikas.sh/post/how-i-got-into-deep-learning):
 One man's roadmap from going zero to hero in machine learning.

@@ -8,4 +8,4 @@ Andrew's Notes
 
 [Interesting Articles]({{< ref "articles" >}})
 
-[Interesting Things]({{< red "misc" >}})
+[Interesting Things]({{< ref "misc" >}})

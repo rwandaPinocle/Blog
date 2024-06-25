@@ -1,6 +1,6 @@
 ---
-title: "misc"
-date: 2024-06-25T22:22:01-07:00
+title: "Misc"
+date: 2024-06-25T15:17:53-07:00
 draft: false
 ---
 
