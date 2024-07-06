@@ -5,6 +5,8 @@ draft: false
 ---
 # Machine Learning and Artificial Intelligence
 
+[ML Compiler class](https://mlc.ai/summer22/schedule):
+A class by the creators of Apache TVM about the theory behind ML compilers.
 
 [Refusal in Language Models is Mediated by a Single Direction](https://arxiv.org/abs/2406.11717):
 The authors find a one dimensional subspace in the activation space of multiple LLMs that controls refusal.
