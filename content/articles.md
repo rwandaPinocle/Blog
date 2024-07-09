@@ -1,9 +1,12 @@
 ---
-title: "Interesting Articles"
+title: "Interesting Articles And Books"
 date: 2024-06-11T11:26:08-07:00
 draft: false
 ---
 # Machine Learning and Artificial Intelligence
+
+[Dive into Deep Learning](https://d2l.ai/index.html):
+A free book on contemporary deep learning, with code examples in PyTorch, Numpy, JAX and Tensorflow
 
 [ML Compiler class](https://mlc.ai/summer22/schedule):
 A class by the creators of Apache TVM about the theory behind ML compilers.
