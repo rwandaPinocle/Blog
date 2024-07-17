@@ -1,5 +1,5 @@
 ---
-title: "Interesting Pieces of Software"
+title: "Interesting Software and Software Tools"
 date: 2024-06-11T11:26:08-07:00
 draft: false
 ---
@@ -47,6 +47,9 @@ An MLP based architecture that matches transformer performance
 A C++ implementation of CLIP
 
 # GPU/Multithreaded Computing 
+
+[Scale](https://docs.scale-lang.com/):
+A toolkit that compiles CUDA code to AMD GPUs.
 
 [NVIDIA Warp](https://github.com/NVIDIA/warp): 
 NVIDIA's Python framework for compiling Python code into compute kernels. 
