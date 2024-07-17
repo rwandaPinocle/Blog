@@ -61,7 +61,7 @@ Supports CUDA.
 
 [Taichi](https://github.com/taichi-dev/taichi):
 Python framework for compiling Python code into compute kernels.
-Has modules for physics sims, NERFs, differentiable programming, 
+Has modules for physics sims, NERFs, differentiable programming.
 Supports CUDA, Vulkan, AMD.
 
 [Pythran](https://pythran.readthedocs.io/en/latest/):
