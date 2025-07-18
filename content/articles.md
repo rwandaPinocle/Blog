@@ -37,6 +37,9 @@ Training on a single gpu
  - https://towardsdatascience.com/editing-text-in-images-with-ai-03dee75d8b9c
  - https://github.com/Mozilla-Ocho/llamafile
 
+[How I keep up with ai progress](https://blog.nilenso.com/blog/2025/06/23/how-i-keep-up-with-ai-progress)
+
+[Simon Wilson's Blog](https://simonwillison.net/)
 
 # Graphics
 
