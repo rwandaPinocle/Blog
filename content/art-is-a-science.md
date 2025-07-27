@@ -35,7 +35,11 @@ Visual art tells us
 2. Our perception of distance is based on color (mountains being faded), overlap, perspective, and prior knowledge of sizes.
 3. Our perception of form is based on silouhette and shadow.
 4. Cartoons tell us that we are highly sensitive to relative proportions of babies and children and are hardwired to like them.
+5. we conflate size with importance and attention. people tend to draw faces to large. Egyptian art made this explicit, with larger figures being more important than small figures 
 
 Video Games
 1. We are motivated by short, tight, feedback loops.
 2. Nagivating 3d dimensional space is highly intuitive.
+3. ergonomics of controllers
+4. variable ratio rewards
+
