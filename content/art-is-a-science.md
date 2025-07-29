@@ -1,8 +1,11 @@
 ---
-title: "Art Is a Science"
+title: "Art Is a Microscope"
 date: 2024-06-08T11:35:31-07:00
 draft: true
 ---
+
+"Art best serves us when it highlights something you might have otherwise missed or never noticed."
+- Niel DeGrasse Tyson
 
 The core of science is measurement.
 We pick a phenomenon, measure it, and use those measurements to inform and falsify theories.
@@ -11,6 +14,8 @@ In the physical world, we can measure things directly with experiments and sophi
 
 Psychology has a problem though, we cannot directly measure the human mind.
 The *brain*, yes, but the mind is different.
+
+Art is to psychology what telescopes are to astronomers.
 
 The people that measure the mind are not scientists or engineers, but artists.
 Art is not merely a collection of items.
@@ -36,6 +41,7 @@ Visual art tells us
 3. Our perception of form is based on silouhette and shadow.
 4. Cartoons tell us that we are highly sensitive to relative proportions of babies and children and are hardwired to like them.
 5. we conflate size with importance and attention. people tend to draw faces to large. Egyptian art made this explicit, with larger figures being more important than small figures 
+6. Neoteny
 
 Video Games
 1. We are motivated by short, tight, feedback loops.
