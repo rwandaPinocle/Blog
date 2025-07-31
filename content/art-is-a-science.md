@@ -4,6 +4,27 @@ date: 2024-06-08T11:35:31-07:00
 draft: false
 ---
 
+What is the value of art?
+What exactly do we get out of it, if anything at all?
+A common answer is that art is pleasurable both to create and to consume which alone makes it worth doing.
+Fair enough.
+After all, who doesn't enjoy sitting down with our friends and families and watching the latest movie or listening to a classic rock album.
+The arts are an enriching and harmless activity that need little justification beyond the fact that we enjoy partaking of it.
+But let's consider a slightly different question.
+What does art contribute to human knowledge?
+Unlike the physical sciences, art has not shed light on the mysteries beyond our planet.
+No painter has ever discovered an unknown species or proved a new theorem by putting her brush to a canvas.
+Nor is that a fair criticism!
+I doubt Walt Disney or his audience ever gave a single thought to what people would learn from his cartoons.
+Frankly, it's obvious to most people, even artists, that their work is strictly aesthetic.
+Pleasing to experience, perhaps eye-wateringly beautiful, but nothing beyond that.
+Art stimulates the senses and stirs the emotions but does not reveal any facts that we did not already know.
+In other words, art has nothing to offer the natural sciences.
+
+I argue that this is false.
+
+
+
 {{/*
 "Art best serves us when it highlights something you might have otherwise missed or never noticed."
 - Niel DeGrasse Tyson
