@@ -1,7 +1,7 @@
 ---
 title: "Art Is a Telescope"
 date: 2024-06-08T11:35:31-07:00
-draft: true
+draft: false
 ---
 
 {/*
