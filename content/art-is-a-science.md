@@ -4,7 +4,7 @@ date: 2024-06-08T11:35:31-07:00
 draft: false
 ---
 
-What is the value of art?
+\tWhat is the value of art?
 What exactly do we get out of it, if anything at all?
 A common answer is that art is pleasurable both to create and to consume which alone makes it worth doing.
 Fair enough.
@@ -26,6 +26,7 @@ I argue that this is false.
 
 
 {{/*
+
 "Art best serves us when it highlights something you might have otherwise missed or never noticed."
 - Niel DeGrasse Tyson
 
