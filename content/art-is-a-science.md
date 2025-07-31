@@ -4,6 +4,7 @@ date: 2024-06-08T11:35:31-07:00
 draft: true
 ---
 
+{/*
 "Art best serves us when it highlights something you might have otherwise missed or never noticed."
 - Niel DeGrasse Tyson
 
@@ -50,3 +51,4 @@ Video Games
 3. ergonomics of controllers
 4. variable ratio rewards
 
+*/}

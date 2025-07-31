@@ -9,3 +9,5 @@ Andrew's Notes
 [Interesting Articles]({{< ref "articles" >}})
 
 [Interesting Things]({{< ref "misc" >}})
+
+[Art is a Telescope]({{< ref "art-is-a-science" >}})
