@@ -1,10 +1,10 @@
 ---
 title: "Art Is a Telescope"
 date: 2024-06-08T11:35:31-07:00
-draft: false
+draft: true
 ---
 
-\tWhat is the value of art?
+What is the value of art?
 What exactly do we get out of it, if anything at all?
 A common answer is that art is pleasurable both to create and to consume which alone makes it worth doing.
 Fair enough.
@@ -22,6 +22,27 @@ Art stimulates the senses and stirs the emotions but does not reveal any facts t
 In other words, art has nothing to offer the natural sciences.
 
 I argue that this is false.
+Art does not merely have emotional content (though that alone makes it worthwhile) but offers us a unique kind of scientific instrument.
+In the same way that telescopes allow us to measure the night sky, art offers us a means of measuring the human mind.
+Further, this knowledge is exclusive to the arts.
+Inaccessible to the scientist through any means other than breifly becoming an artist.
+I will first show this in the abstract by discussing the philosophy of science and drawing parallels to the history of western art.
+Then I will provide several concrete examples from the fields of illustration, music theory, and video games.
+
+# Puzzles and Progress
+
+This graph shows the price of lithium-ion batteries since 2010.
+![](static/images/li-ion-battery-price.001.png)
+
+This one shows the best upper bound mathematicians were able to prove for the twin prime conjecture after Yitang Zhang published the first result in 2013.
+![](static/images/Screenshot from 2025-08-01 23-25-21.png)
+https://www.speedrun.com/celeste/stats?h=Any&x=7kjpl1gk
+
+And lastly, this is a best speedrun times for the game "Celeste" since 2017.
+![](static/images/celeste-speedruns.png)
+https://klotza.blogspot.com/2016/06/the-fall-of-twin-prime-gap.html
+
+
 
 
 
@@ -50,6 +71,14 @@ The sociology of art is isomorphic to the sociology of science.
 The result of this community art process is that artists now produce art that "shaped like" the human mind.
 For instance, by studying storytelling conventions, we learn what kinds of narratives people are easily able to remember.
 We learn that events are best communicated with distinct characters, clear conflicts, and resolutions to those conflicts.
+
+AI would struggle to produce something beautiful in a new medium because beauty is judged by the mind.
+Diffusion algorithms mere optimize for an objective that is already extremely well measured by existing artists.
+It would have no knowledge of the parts of the mind measured by new mediums.
+
+# Knowledge that is exclusive to the arts
+1. Brandon Sanderson talks about the approximate lengths that certain stories can be before the audience loses interest.
+2. The hollywood formula tells how how much time should be between story beats for audiences to understand them.
 
 Music theory tells us that
 1. Our aural systems are extremely responsive to the range of a high pitched human voice.
