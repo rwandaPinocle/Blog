@@ -51,3 +51,6 @@ Explains the different methods of handling rotations in graphics, with very nift
 [Spaced repetition for teaching two-year olds how to read](https://chrislakin.blog/p/spaced-repetition-for-teaching-two):
 An interview with a father who taught his 2 year old daughter to read with Anki.
 
+[Getting started with database development](https://www.reddit.com/r/databasedevelopment/comments/unj8d1/getting_started_with_database_development/)
+Phil Eaton's guide to database dev
+
