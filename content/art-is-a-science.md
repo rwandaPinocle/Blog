@@ -1,14 +1,14 @@
 ---
 title: "Art Is a Telescope"
 date: 2024-06-08T11:35:31-07:00
-draft: true
+draft: false
 ---
 
 What is the value of art?
 What exactly do we get out of it, if anything at all?
 A common answer is that art is pleasurable both to create and to consume which alone makes it worth doing.
 Fair enough.
-After all, who doesn't enjoy sitting down with our friends and families and watching the latest movie or listening to a classic rock album.
+After all, who doesn't enjoy sitting down with our friends and families to watch a good movie or listen to a well made rock album.
 The arts are an enriching and harmless activity that need little justification beyond the fact that we enjoy partaking of it.
 But let's consider a slightly different question.
 What does art contribute to human knowledge?
@@ -42,12 +42,36 @@ And lastly, this is a best speedrun times for the game "Celeste" since 2017.
 ![](static/images/celeste-speedruns.png)
 https://klotza.blogspot.com/2016/06/the-fall-of-twin-prime-gap.html
 
+All of these curves are produced by the following social process:
+1. A community of ~nerds~ curious people come together and establish a shared metric of success that they all aim to bring down as close to zero as possible.
+2. The initial progress is fast. Low hanging fruit is quickly picked and the community makes rapid progress.
+3. Progress slows as more difficult problems accumulate. Progress becomes mostly incremental and increasingly laborious.
+
+The day to day lives of scientists are filled with examples of this process being carried out in laboratories and conferences.
+In "The Structure of Scientific Revolutions" the philosopher Thomas Khun names this process "normal science".
+Specifically, Khun argues that the vast majority of science takes place with a set of assumptions called a paradigm.
+Once a paradigm is decided upon, researchers methodically gather data and generate theories to fit.
+The early results of exploring the paradigm result in the initial low hanging fruit phase where progress is rapid and large amounts of data is quickly explained.
+For Khun, the interesting part is the second, slower phase.
+No theory fits the totality of data perfectly and as normal science continues, the best theories will accumumlate more and more contradictory data.
+Scientists are faced with a choice.
+They can throw their hands in the air and give up on trying to find better theories or they can dismantle the assumptions of their paradigm in search of a new one.
+Khun calls this a "paradigm shift" makes this a cornerstone of his philsophy of science.
+He identifies the Copernican revolution (the planets move around the sun) and Dalton's atomic theory (molecules consist of integer numbers of atoms) as definitive examples of paradigm shifts.
+After the community decides on a new paradigm, the process begins anew and researchers return to the task of normal science.
+
+# The Efforts of Artists
+
+What I hope to show is two fold:
+1. Pieces of art are a type of data that reveal new knowledge about the human mind.
+2. The history of art, like the history of chemistry or physics, contains long periods of normal science that are periodically upended by paradigm shifts driven by technology.
 
 
 
 
-{{/*
 
+
+<!--
 "Art best serves us when it highlights something you might have otherwise missed or never noticed."
 - Niel DeGrasse Tyson
 
@@ -103,3 +127,5 @@ Video Games
 4. variable ratio rewards
 
 */}}
+-->
+
