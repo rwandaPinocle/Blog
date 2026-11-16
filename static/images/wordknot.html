@@ -1,0 +1,2614 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wordknot</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='3' width='12' height='12' rx='3' fill='%23e4572e'/><rect x='17' y='3' width='12' height='12' rx='3' fill='%232e3a87'/><rect x='3' y='17' width='12' height='12' rx='3' fill='%232e3a87'/><rect x='17' y='17' width='12' height='12' rx='3' fill='%23e4572e'/></svg>">
+  <style>
+:root {
+  --bg: #f4efe6;
+  --panel: #fffdf8;
+  --ink: #1f2335;
+  --muted: #6b6f80;
+  --line: #ddd5c6;
+  --accent: #e4572e;
+  --accent-ink: #fff;
+  --indigo: #2e3a87;
+  --card-bg: #ffffff;
+  --card-line: #c9c0ae;
+  --zone: #e9e1d2;
+  --zone-ink: #2e3a87;
+  --ok: #2f8f4e;
+  --bad: #c62f2f;
+  --slot: #ebe4d7;
+  --shadow: 0 2px 6px rgba(40, 30, 10, .12);
+  /* one colour per big-cube face: Right, Left, Top, Bottom, Front, Back */
+  --f0: #1f8fb5;
+  --f1: #c48a00;
+  --f2: #e4572e;
+  --f3: #6c4fc4;
+  --f4: #2f8f4e;
+  --f5: #b03a78;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15171f;
+    --panel: #1e212c;
+    --ink: #ecebe6;
+    --muted: #9a9cab;
+    --line: #333748;
+    --accent: #f06b45;
+    --indigo: #8f9cf5;
+    --card-bg: #262a37;
+    --card-line: #454a5e;
+    --zone: #252938;
+    --zone-ink: #aab4ff;
+    --ok: #4cc276;
+    --bad: #f06060;
+    --slot: #1a1d27;
+    --shadow: 0 2px 8px rgba(0, 0, 0, .4);
+    --f0: #4bb8de;
+    --f1: #e2b23a;
+    --f2: #f07a55;
+    --f3: #9d85ec;
+    --f4: #4cc276;
+    --f5: #e06aa8;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #15171f;
+  --panel: #1e212c;
+  --ink: #ecebe6;
+  --muted: #9a9cab;
+  --line: #333748;
+  --accent: #f06b45;
+  --indigo: #8f9cf5;
+  --card-bg: #262a37;
+  --card-line: #454a5e;
+  --zone: #252938;
+  --zone-ink: #aab4ff;
+  --ok: #4cc276;
+  --bad: #f06060;
+  --slot: #1a1d27;
+  --shadow: 0 2px 8px rgba(0, 0, 0, .4);
+  --f0: #4bb8de;
+  --f1: #e2b23a;
+  --f2: #f07a55;
+  --f3: #9d85ec;
+  --f4: #4cc276;
+  --f5: #e06aa8;
+}
+
+.d0 {
+  --fc: var(--f0);
+}
+
+.d1 {
+  --fc: var(--f1);
+}
+
+.d2 {
+  --fc: var(--f2);
+}
+
+.d3 {
+  --fc: var(--f3);
+}
+
+.d4 {
+  --fc: var(--f4);
+}
+
+.d5 {
+  --fc: var(--f5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.brand {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: .02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  display: grid;
+  grid-template-columns: 10px 10px;
+  gap: 2px;
+}
+
+.logo i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--indigo);
+}
+
+.logo i:nth-child(1),
+.logo i:nth-child(4) {
+  background: var(--accent);
+}
+
+#topinfo {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: right;
+}
+
+#topinfo b {
+  color: var(--ink);
+}
+
+main {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+.narrowmax {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 26px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.stack>*+* {
+  margin-top: 10px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+input[type=text] {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  min-width: 0;
+  width: 100%;
+}
+
+input[type=text]:focus {
+  outline: 2px solid var(--indigo);
+  outline-offset: 1px;
+}
+
+label {
+  font-size: 14px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--indigo);
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+.btn.primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.btn.on {
+  background: var(--ok);
+  color: #fff;
+  border-color: var(--ok);
+}
+
+.btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.btn.small {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.players {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.players li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.players li:last-child {
+  border-bottom: 0;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ok);
+  flex: none;
+}
+
+.dot.off {
+  background: var(--muted);
+  opacity: .5;
+}
+
+.tag {
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--zone);
+  color: var(--zone-ink);
+  font-weight: 600;
+}
+
+.tag.ok {
+  background: var(--ok);
+  color: #fff;
+}
+
+.fdot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--fc);
+  margin-right: 6px;
+  vertical-align: 0;
+}
+
+.code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  color: var(--accent);
+}
+
+table.records {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table.records td,
+table.records th {
+  text-align: left;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+table.records th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+table.records td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+table.records tr.me td {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Selected piece controls, right under the 3D view */
+.inspect {
+  max-width: 560px;
+  margin: 12px auto 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.wordrow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 45px;
+  margin: 0 0 12px;
+}
+
+.wordrow:not(.empty) {
+  background: color-mix(in srgb, var(--pc) 24%, var(--card-bg));
+  border-radius: 10px;
+}
+
+/* same colour as the selected piece */
+.wordrow .w {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 0 4px 18px;
+  line-height: 1.2;
+}
+
+.wordrow .w:hover:not(.hid) {
+  color: var(--indigo);
+  background: color-mix(in srgb, var(--indigo) 8%, transparent);
+}
+
+.wordrow .w.hid {
+  cursor: default;
+}
+
+.wordrow .w:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -2px;
+}
+
+.wordrow .hl {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 25%;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--muted) 24%, transparent);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform .35s cubic-bezier(.3, .7, .3, 1);
+}
+
+.wordrow .hl small {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+
+.wordrow.empty {
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+.wordrow.empty .w,
+.wordrow.empty .w:hover {
+  color: var(--muted);
+  background: none;
+  cursor: default;
+  font-weight: 600;
+  padding: 0;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordrow .hl {
+    transition: none;
+  }
+}
+
+/* ---------- 3D tetrahedron ---------- */
+.scene {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  flex: 1 1 300px;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  overflow: hidden;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 51%, var(--zone) 0%, transparent 70%);
+}
+
+.scene:active {
+  cursor: grabbing;
+}
+
+.shape3d {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+
+.tpiece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  transform-origin: 0 0 0;
+}
+
+.tface {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  backface-visibility: hidden;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.tface svg.tri {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tface polygon {
+  fill: var(--card-bg);
+  stroke: var(--card-line);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* Piece colours (one per piece, see pieceCls in app.js) */
+.p0 {
+  --pc: var(--f0);
+}
+
+.p1 {
+  --pc: var(--f1);
+}
+
+.p2 {
+  --pc: var(--f3);
+}
+
+.p3 {
+  --pc: var(--f5);
+}
+
+.tface.out polygon {
+  fill: color-mix(in srgb, var(--pc) 16%, var(--card-bg));
+  stroke: var(--pc);
+  stroke-width: 5;
+}
+
+.tface.ghostface polygon {
+  fill: var(--card-bg);
+  stroke: var(--card-line);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 5;
+}
+
+.tface span {
+  position: absolute;
+  left: 50%;
+  top: 68%;
+  transform: translate(-50%, -50%);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tpiece.clickable .tface {
+  cursor: pointer;
+}
+
+/* Pieces other than the one nearest the camera are faded by mixing their colours toward the background.
+   They stay opaque: nothing in the 3D shape is see-through. */
+.tpiece.faded .tface polygon {
+  fill: color-mix(in srgb, var(--card-bg) 45%, var(--bg));
+}
+
+.tpiece.faded .tface.out polygon {
+  fill: color-mix(in srgb, var(--pc) 10%, color-mix(in srgb, var(--card-bg) 45%, var(--bg)));
+  stroke: color-mix(in srgb, var(--pc) 45%, var(--bg));
+}
+
+.tpiece.faded .tface.ghostface polygon {
+  stroke: color-mix(in srgb, var(--card-line) 60%, var(--bg));
+}
+
+.tpiece.faded .tface span {
+  color: color-mix(in srgb, var(--ink) 50%, var(--bg));
+}
+
+.tpiece.sel .tface.out polygon {
+  stroke: var(--pc);
+  stroke-width: 7;
+  fill: color-mix(in srgb, var(--pc) 24%, var(--card-bg));
+}
+
+.tpiece.locked .tface.out polygon {
+  stroke: var(--ok);
+}
+
+.tpiece.hover .tface polygon {
+  filter: brightness(.93);
+}
+
+.tpiece.ghost.sel .tface polygon {
+  stroke: var(--accent);
+  stroke-width: 3.5;
+  fill: color-mix(in srgb, var(--accent) 18%, var(--card-bg));
+}
+
+.tpiece.ghost.hover .tface polygon,
+.tpiece.ghost.dragover .tface polygon {
+  fill: color-mix(in srgb, var(--accent) 25%, var(--card-bg));
+}
+
+.tface.hintface span {
+  top: 66%;
+  padding: .35em .55em;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--zone) 88%, #000);
+  color: var(--ink);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.scene .hint {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 15px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.fdot.hidden {
+  background: var(--muted);
+}
+
+/* ---------- pile chips ---------- */
+/* The pile (and its heading) is as wide as the 3D view below it. */
+.pool, .pilehead {
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pool {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 0;
+  justify-content: center;
+  min-height: 90px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 2px dashed var(--line);
+}
+
+.pool.target {
+  border-color: var(--accent);
+  cursor: pointer;
+}
+
+.pool.dragover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.pool .empty-note {
+  align-self: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Pile pieces overlap their neighbours' bounding boxes, so only the triangle itself takes the pointer. */
+.chip {
+  display: inline-flex;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(40, 30, 10, .18));
+}
+
+.chip svg {
+  display: block;
+  overflow: visible;
+}
+
+.chip polygon {
+  fill: var(--card-bg);
+  stroke: var(--card-line);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.chip polygon {
+  fill: color-mix(in srgb, var(--pc) 16%, var(--card-bg));
+  stroke: color-mix(in srgb, var(--pc) 45%, var(--card-bg));
+}
+
+.chip polygon.outline {
+  pointer-events: fill;
+  fill: none;
+  stroke: var(--pc);
+  stroke-width: 3;
+}
+
+.chip text {
+  fill: var(--ink);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  font-family: inherit;
+}
+
+.chip.grab {
+  cursor: grab;
+}
+
+.chip.selected polygon {
+  fill: color-mix(in srgb, var(--accent) 14%, var(--card-bg));
+}
+
+.chip.selected polygon.outline {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+}
+
+.chip.big {
+  margin: 4px auto;
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------- check marks ---------- */
+.tpiece.ok .tface.out polygon {
+  stroke: var(--ok);
+  fill: color-mix(in srgb, var(--ok) 14%, var(--card-bg));
+}
+
+.tpiece.bad .tface.out polygon {
+  stroke: var(--bad);
+  fill: color-mix(in srgb, var(--bad) 14%, var(--card-bg));
+}
+
+/* ---------- puzzle list ---------- */
+.psection {
+  font-size: 18px;
+  margin: 18px 0 10px;
+}
+
+.psection .muted {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.plist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.pcard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "num title" "num meta" "num best";
+  column-gap: 12px;
+  row-gap: 2px;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.pcard:hover {
+  border-color: var(--indigo);
+}
+
+.pcard .pnum {
+  grid-area: num;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--zone);
+  color: var(--zone-ink);
+  font-weight: 800;
+}
+
+.pcard.done .pnum {
+  background: var(--ok);
+  color: #fff;
+}
+
+.pcard .ptitle {
+  grid-area: title;
+  font-weight: 700;
+}
+
+.pcard .phints {
+  grid-area: meta;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pcard .pbest {
+  grid-area: best;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pcard.done .pbest {
+  color: var(--ok);
+}
+
+/* ---------- language picker ---------- */
+.langs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.lang {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 6px 8px 6px 6px;
+  background: var(--panel);
+}
+
+.lang.on {
+  border-color: var(--indigo);
+}
+
+.langbtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+.lang.on .langbtn {
+  color: var(--ink);
+}
+
+.langbtn .box {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.lang.on .langbtn .box {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: var(--panel);
+}
+
+.langbtn:focus-visible,
+.segbtn:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 1px;
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.segbtn {
+  border: 0;
+  background: none;
+  padding: 3px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.segbtn+.segbtn {
+  border-left: 1px solid var(--line);
+}
+
+.segbtn.on {
+  background: var(--zone);
+  color: var(--zone-ink);
+  font-weight: 700;
+}
+
+.lang:not(.on) .seg {
+  opacity: .6;
+}
+
+@media (max-width: 520px) {
+  .tlangs {
+    display: none;
+  }
+}
+
+/* ---------- timer ---------- */
+.timerlabel {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 700;
+}
+
+.timer {
+  font-size: 40px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  user-select: none;
+}
+
+.timer.done {
+  color: var(--ok);
+}
+
+.banner.solved {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bigtime {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.muted-ok {
+  font-weight: 500;
+  font-size: 14px;
+  opacity: .85;
+}
+
+/* ---------- buttons on the 3D view ---------- */
+.inspect .wordrow { margin: 0; }
+#scenectl {
+  position: absolute; z-index: 5; bottom: 10px; left: 12.5%; width: 75%;
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px;
+}
+#scenectl:empty { display: none; }
+.scenebtn { cursor: pointer; font-size: 13px; min-height: 36px; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+.scenebtn.trash { display: grid; place-items: center; width: 48px; padding: 0; color: var(--bad); }
+.scenebtn.trash:hover:not(:disabled) { background: color-mix(in srgb, var(--bad) 12%, var(--card-bg)); }
+
+@media (max-width: 520px) {
+  .wordrow .w {
+    font-size: 13px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+.facing {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.facing li {
+  padding: 3px 0;
+}
+
+.banner {
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-weight: 600;
+  background: var(--zone);
+  color: var(--zone-ink);
+}
+
+.banner.bad {
+  background: color-mix(in srgb, var(--bad) 18%, var(--panel));
+  color: var(--bad);
+}
+
+.banner.ok {
+  background: color-mix(in srgb, var(--ok) 18%, var(--panel));
+  color: var(--ok);
+}
+
+.banner.spec {
+  background: color-mix(in srgb, var(--accent) 16%, var(--panel));
+  color: var(--accent);
+}
+
+.cluefields {
+  display: grid;
+  gap: 10px;
+}
+
+.cluefield .pair {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.cluefield .pair b {
+  color: var(--ink);
+}
+
+.bigscore {
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.rules {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.rules ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: 10px;
+  transition: transform .25s ease, visibility .25s;
+  max-width: calc(100vw - 32px);
+  z-index: 10;
+  font-size: 15px;
+  visibility: hidden;
+}
+
+#toast.show {
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
+}
+
+@media (max-width: 520px) {
+  main {
+    padding: 14px 12px 40px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  .topbar {
+    padding: 8px 12px;
+  }
+
+  .pool {
+    gap: 8px;
+    padding: 8px;
+  }
+}</style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" id="home" title="All puzzles"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Wordknot</a>
+    <div id="topinfo"></div>
+  </header>
+  <main id="app"></main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+// Shared tetrahedron geometry (used by both the server and the browser).
+//
+// The big shape is a regular tetrahedron made of 4 half-size "pieces", one at each corner,
+// with an empty octahedral space in the middle (a level-1 Sierpinski tetrahedron).
+//
+// World axes: x = right, y = up, z = toward the viewer. VERTS are the big tetrahedron's corners
+// (circumradius 1, centred on the origin). Vertex v, the piece at corner v (slot v), and the face
+// opposite vertex v (face v) all share the index v:
+//   vertex/slot: 0 = top, 1 = back, 2 = front-right, 3 = front-left
+//   face:        0 = Base, 1 = Front, 2 = Left, 3 = Right
+// A piece has 4 words; words[k] sits on its local face k (opposite its local vertex k).
+// An orientation is an even permutation P of the 4 vertices (the 12 rotations of a tetrahedron):
+// local vertex k goes to world vertex P[k], so local face k faces world direction P[k].
+// The piece in slot s shows 3 words outward (directions != s) and hides one facing the centre.
+(function (root, factory) {
+  const geo = factory();
+  if (typeof module === 'object' && module.exports) module.exports = geo;
+  else root.Geo = geo;
+})(typeof self !== 'undefined' ? self : this, function () {
+  const r = Math.sqrt(8) / 3;
+  const rad = (d) => (d * Math.PI) / 180;
+  const VERTS = [
+    [0, 1, 0],
+    [0, -1 / 3, -r],
+    [r * Math.sin(rad(120)), -1 / 3, -r * Math.cos(rad(120))],
+    [r * Math.sin(rad(240)), -1 / 3, -r * Math.cos(rad(240))],
+  ];
+  const NORMALS = VERTS.map((v) => v.map((x) => -x)); // outward normal of face f
+  const FACE_NAMES = ['Base', 'Front', 'Left', 'Right'];
+  const FACE_ORDER = [1, 2, 3, 0];
+  const SLOT_NAMES = ['Top corner', 'Back corner', 'Front-right corner', 'Front-left corner'];
+
+  const sub = (a, b) => a.map((x, i) => x - b[i]);
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+
+  // The 12 rotations = even permutations of the vertices (identity first).
+  const PERM = [];
+  (function gen(prefix, rest) {
+    if (!rest.length) {
+      let inv = 0;
+      for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) if (prefix[i] > prefix[j]) inv++;
+      if (inv % 2 === 0) PERM.push(prefix);
+      return;
+    }
+    rest.forEach((x, i) => gen([...prefix, x], [...rest.slice(0, i), ...rest.slice(i + 1)]));
+  })([], [0, 1, 2, 3]);
+  const INV = PERM.map((p) => { const inv = []; p.forEach((w, l) => { inv[w] = l; }); return inv; });
+  const ORIENTS = PERM.length; // 12
+
+  const OUTWARD = [0, 1, 2, 3].map((s) => [0, 1, 2, 3].filter((f) => f !== s));
+
+  // Each face as [top, bottom-left, bottom-right] vertex (= slot) indices, as seen from outside.
+  // Side faces read with the apex at the top; the base reads with the back corner at the top.
+  const TOP = [1, 0, 0, 0];
+  const FACE_TRI = [0, 1, 2, 3].map((f) => {
+    const T = TOP[f];
+    let [a, b] = [0, 1, 2, 3].filter((v) => v !== f && v !== T);
+    // T -> BL -> BR must run counter-clockwise when viewed from outside.
+    if (dot(cross(sub(VERTS[a], VERTS[T]), sub(VERTS[b], VERTS[T])), NORMALS[f]) < 0) [a, b] = [b, a];
+    return [T, a, b];
+  });
+  const FACE_SLOTS = FACE_TRI; // slots on a face, in [top, bottom-left, bottom-right] order
+
+  function wordOn(words, o, dir) {
+    return words[INV[o][dir]];
+  }
+
+  const permIndex = (p) => PERM.findIndex((q) => q.every((x, i) => x === p[i]));
+
+  // Twist the piece in `slot` a third of a turn about its corner's axis (keeps the hidden word,
+  // cycles the 3 outward ones). dir = 1: counter-clockwise as seen from outside that corner.
+  function twist(o, slot, dir) {
+    let [a, b, c] = OUTWARD[slot];
+    if (dot(cross(sub(VERTS[b], VERTS[a]), sub(VERTS[c], VERTS[a])), VERTS[slot]) < 0) [b, c] = [c, b];
+    const G = [0, 1, 2, 3];
+    if (dir === -1) { G[a] = c; G[c] = b; G[b] = a; } else { G[a] = b; G[b] = c; G[c] = a; }
+    return permIndex(PERM[o].map((w) => G[w]));
+  }
+
+  // "Twist in": change which word is hidden, by a third of a turn about an axis running from one of the
+  // piece's corners through the centre of the opposite face.
+  // Bottom pieces (slots 1-3) use the vertical axis (top corner -> base face), counter-clockwise seen from
+  // above: their base word stays put and the hidden word swaps with a side word.
+  // For the top piece that axis runs through its own corner (that's just Twist left), so it uses the axis
+  // from its back corner through the centre of its front face instead: the front word stays put.
+  function twistIn(o, slot) {
+    return twist(o, slot === 0 ? 1 : 0, 1);
+  }
+
+  // Orientation that puts local face `local` toward world direction `dir`, keeping the words currently
+  // facing `keepDirs` where possible. keepDirs is in priority order: only one other word can usually stay put,
+  // so earlier directions win.
+  function orientFacing(o, local, dir, keepDirs) {
+    let best = null;
+    let bestScore = -1;
+    for (let c = 0; c < ORIENTS; c++) {
+      if (PERM[c][local] !== dir) continue;
+      const score = keepDirs.reduce((n, d, i) => n + (INV[c][d] === INV[o][d] ? 2 ** (keepDirs.length - i) : 0), 0);
+      if (score > bestScore) { best = c; bestScore = score; }
+    }
+    return best;
+  }
+
+  const slotName = (s) => SLOT_NAMES[s];
+
+  return { VERTS, NORMALS, FACE_NAMES, FACE_ORDER, PERM, INV, ORIENTS, OUTWARD, FACE_TRI, FACE_SLOTS, wordOn, twist, twistIn, orientFacing, slotName, sub, dot, cross };
+});
+</script>
+  <script>
+// English words with their translations, grouped by theme. The puzzles are built from this in the browser.
+// Columns: English, Spanish, Italian, Portuguese (Brazil), French, then [romanized, native] for
+// Japanese (Hepburn / kana and kanji), Chinese (pinyin with tone marks / simplified characters) and
+// Korean (Revised Romanization / Hangul).
+(function (root, factory) {
+  const d = factory();
+  if (typeof module === 'object' && module.exports) module.exports = d;
+  else root.DICTIONARY = d;
+})(typeof self !== 'undefined' ? self : this, function () {
+  return {
+    languages: [
+      { code: 'es', name: 'Spanish' },
+      { code: 'it', name: 'Italian' },
+      { code: 'pt', name: 'Portuguese' },
+      { code: 'fr', name: 'French' },
+      { code: 'ja', name: 'Japanese', roman: 'Rōmaji', native: '日本語' },
+      { code: 'zh', name: 'Chinese', roman: 'Pinyin', native: '中文' },
+      { code: 'ko', name: 'Korean', roman: 'Romanized', native: '한국어' },
+    ],
+    categories: {
+      'Animals': [
+        ['Cat', 'gato', 'gatto', 'gato', 'chat', ['neko', '猫'], ['māo', '猫'], ['goyangi', '고양이']],
+        ['Dog', 'perro', 'cane', 'cão', 'chien', ['inu', '犬'], ['gǒu', '狗'], ['gae', '개']],
+        ['Horse', 'caballo', 'cavallo', 'cavalo', 'cheval', ['uma', '馬'], ['mǎ', '马'], ['mal', '말']],
+        ['Cow', 'vaca', 'mucca', 'vaca', 'vache', ['ushi', '牛'], ['niú', '牛'], ['so', '소']],
+        ['Pig', 'cerdo', 'maiale', 'porco', 'cochon', ['buta', '豚'], ['zhū', '猪'], ['dwaeji', '돼지']],
+        ['Bird', 'pájaro', 'uccello', 'pássaro', 'oiseau', ['tori', '鳥'], ['niǎo', '鸟'], ['sae', '새']],
+        ['Fish', 'pez', 'pesce', 'peixe', 'poisson', ['sakana', '魚'], ['yú', '鱼'], ['mulgogi', '물고기']],
+        ['Rabbit', 'conejo', 'coniglio', 'coelho', 'lapin', ['usagi', 'うさぎ'], ['tùzi', '兔子'], ['tokki', '토끼']],
+        ['Lion', 'león', 'leone', 'leão', 'lion', ['raion', 'ライオン'], ['shīzi', '狮子'], ['saja', '사자']],
+        ['Bear', 'oso', 'orso', 'urso', 'ours', ['kuma', '熊'], ['xióng', '熊'], ['gom', '곰']],
+        ['Mouse', 'ratón', 'topo', 'rato', 'souris', ['nezumi', 'ねずみ'], ['lǎoshǔ', '老鼠'], ['jwi', '쥐']],
+        ['Monkey', 'mono', 'scimmia', 'macaco', 'singe', ['saru', '猿'], ['hóuzi', '猴子'], ['wonsungi', '원숭이']],
+        ['Elephant', 'elefante', 'elefante', 'elefante', 'éléphant', ['zō', '象'], ['dàxiàng', '大象'], ['kokkiri', '코끼리']],
+        ['Snake', 'serpiente', 'serpente', 'cobra', 'serpent', ['hebi', '蛇'], ['shé', '蛇'], ['baem', '뱀']],
+      ],
+      'Food': [
+        ['Bread', 'pan', 'pane', 'pão', 'pain', ['pan', 'パン'], ['miànbāo', '面包'], ['ppang', '빵']],
+        ['Cheese', 'queso', 'formaggio', 'queijo', 'fromage', ['chīzu', 'チーズ'], ['nǎilào', '奶酪'], ['chijeu', '치즈']],
+        ['Rice', 'arroz', 'riso', 'arroz', 'riz', ['gohan', 'ご飯'], ['mǐfàn', '米饭'], ['bap', '밥']],
+        ['Egg', 'huevo', 'uovo', 'ovo', 'œuf', ['tamago', '卵'], ['jīdàn', '鸡蛋'], ['gyeran', '계란']],
+        ['Apple', 'manzana', 'mela', 'maçã', 'pomme', ['ringo', 'りんご'], ['píngguǒ', '苹果'], ['sagwa', '사과']],
+        ['Meat', 'carne', 'carne', 'carne', 'viande', ['niku', '肉'], ['ròu', '肉'], ['gogi', '고기']],
+        ['Soup', 'sopa', 'zuppa', 'sopa', 'soupe', ['sūpu', 'スープ'], ['tāng', '汤'], ['guk', '국']],
+        ['Cake', 'tarta', 'torta', 'bolo', 'gâteau', ['kēki', 'ケーキ'], ['dàngāo', '蛋糕'], ['keikeu', '케이크']],
+        ['Salt', 'sal', 'sale', 'sal', 'sel', ['shio', '塩'], ['yán', '盐'], ['sogeum', '소금']],
+        ['Sugar', 'azúcar', 'zucchero', 'açúcar', 'sucre', ['satō', '砂糖'], ['táng', '糖'], ['seoltang', '설탕']],
+        ['Orange', 'naranja', 'arancia', 'laranja', 'orange', ['orenji', 'オレンジ'], ['chéngzi', '橙子'], ['orenji', '오렌지']],
+        ['Grape', 'uva', 'uva', 'uva', 'raisin', ['budō', 'ぶどう'], ['pútao', '葡萄'], ['podo', '포도']],
+        ['Strawberry', 'fresa', 'fragola', 'morango', 'fraise', ['ichigo', 'いちご'], ['cǎoméi', '草莓'], ['ttalgi', '딸기']],
+      ],
+      'Drinks': [
+        ['Water', 'agua', 'acqua', 'água', 'eau', ['mizu', '水'], ['shuǐ', '水'], ['mul', '물']],
+        ['Milk', 'leche', 'latte', 'leite', 'lait', ['gyūnyū', '牛乳'], ['niúnǎi', '牛奶'], ['uyu', '우유']],
+        ['Tea', 'té', 'tè', 'chá', 'thé', ['ocha', 'お茶'], ['chá', '茶'], ['cha', '차']],
+        ['Coffee', 'café', 'caffè', 'café', 'café', ['kōhī', 'コーヒー'], ['kāfēi', '咖啡'], ['keopi', '커피']],
+        ['Wine', 'vino', 'vino', 'vinho', 'vin', ['wain', 'ワイン'], ['pútaojiǔ', '葡萄酒'], ['wain', '와인']],
+        ['Beer', 'cerveza', 'birra', 'cerveja', 'bière', ['bīru', 'ビール'], ['píjiǔ', '啤酒'], ['maekju', '맥주']],
+        ['Juice', 'zumo', 'succo', 'suco', 'jus', ['jūsu', 'ジュース'], ['guǒzhī', '果汁'], ['jusu', '주스']],
+      ],
+      'Nature': [
+        ['Sun', 'sol', 'sole', 'sol', 'soleil', ['taiyō', '太陽'], ['tàiyáng', '太阳'], ['hae', '해']],
+        ['Moon', 'luna', 'luna', 'lua', 'lune', ['tsuki', '月'], ['yuèliang', '月亮'], ['dal', '달']],
+        ['Star', 'estrella', 'stella', 'estrela', 'étoile', ['hoshi', '星'], ['xīngxing', '星星'], ['byeol', '별']],
+        ['Sky', 'cielo', 'cielo', 'céu', 'ciel', ['sora', '空'], ['tiānkōng', '天空'], ['haneul', '하늘']],
+        ['Sea', 'mar', 'mare', 'mar', 'mer', ['umi', '海'], ['hǎi', '海'], ['bada', '바다']],
+        ['River', 'río', 'fiume', 'rio', 'rivière', ['kawa', '川'], ['hé', '河'], ['gang', '강']],
+        ['Mountain', 'montaña', 'montagna', 'montanha', 'montagne', ['yama', '山'], ['shān', '山'], ['san', '산']],
+        ['Tree', 'árbol', 'albero', 'árvore', 'arbre', ['ki', '木'], ['shù', '树'], ['namu', '나무']],
+        ['Flower', 'flor', 'fiore', 'flor', 'fleur', ['hana', '花'], ['huā', '花'], ['kkot', '꽃']],
+        ['Stone', 'piedra', 'pietra', 'pedra', 'pierre', ['ishi', '石'], ['shítou', '石头'], ['dol', '돌']],
+        ['Island', 'isla', 'isola', 'ilha', 'île', ['shima', '島'], ['dǎo', '岛'], ['seom', '섬']],
+        ['Cloud', 'nube', 'nuvola', 'nuvem', 'nuage', ['kumo', '雲'], ['yún', '云'], ['gureum', '구름']],
+      ],
+      'Weather': [
+        ['Rain', 'lluvia', 'pioggia', 'chuva', 'pluie', ['ame', '雨'], ['yǔ', '雨'], ['bi', '비']],
+        ['Snow', 'nieve', 'neve', 'neve', 'neige', ['yuki', '雪'], ['xuě', '雪'], ['nun', '눈']],
+        ['Wind', 'viento', 'vento', 'vento', 'vent', ['kaze', '風'], ['fēng', '风'], ['baram', '바람']],
+        ['Fire', 'fuego', 'fuoco', 'fogo', 'feu', ['hi', '火'], ['huǒ', '火'], ['bul', '불']],
+        ['Light', 'luz', 'luce', 'luz', 'lumière', ['hikari', '光'], ['guāng', '光'], ['bit', '빛']],
+        ['Summer', 'verano', 'estate', 'verão', 'été', ['natsu', '夏'], ['xiàtiān', '夏天'], ['yeoreum', '여름']],
+        ['Winter', 'invierno', 'inverno', 'inverno', 'hiver', ['fuyu', '冬'], ['dōngtiān', '冬天'], ['gyeoul', '겨울']],
+        ['Spring', 'primavera', 'primavera', 'primavera', 'printemps', ['haru', '春'], ['chūntiān', '春天'], ['bom', '봄']],
+        ['Autumn', 'otoño', 'autunno', 'outono', 'automne', ['aki', '秋'], ['qiūtiān', '秋天'], ['gaeul', '가을']],
+      ],
+      'Body': [
+        ['Hand', 'mano', 'mano', 'mão', 'main', ['te', '手'], ['shǒu', '手'], ['son', '손']],
+        ['Eye', 'ojo', 'occhio', 'olho', 'œil', ['me', '目'], ['yǎnjing', '眼睛'], ['nun', '눈']],
+        ['Heart', 'corazón', 'cuore', 'coração', 'cœur', ['kokoro', '心'], ['xīn', '心'], ['simjang', '심장']],
+        ['Head', 'cabeza', 'testa', 'cabeça', 'tête', ['atama', '頭'], ['tóu', '头'], ['meori', '머리']],
+        ['Mouth', 'boca', 'bocca', 'boca', 'bouche', ['kuchi', '口'], ['zuǐ', '嘴'], ['ip', '입']],
+        ['Nose', 'nariz', 'naso', 'nariz', 'nez', ['hana', '鼻'], ['bízi', '鼻子'], ['ko', '코']],
+        ['Ear', 'oreja', 'orecchio', 'orelha', 'oreille', ['mimi', '耳'], ['ěrduo', '耳朵'], ['gwi', '귀']],
+        ['Foot', 'pie', 'piede', 'pé', 'pied', ['ashi', '足'], ['jiǎo', '脚'], ['bal', '발']],
+        ['Hair', 'pelo', 'capelli', 'cabelo', 'cheveux', ['kami', '髪'], ['tóufa', '头发'], ['meorikarak', '머리카락']],
+        ['Tooth', 'diente', 'dente', 'dente', 'dent', ['ha', '歯'], ['yá', '牙'], ['chia', '치아']],
+      ],
+      'People': [
+        ['Mother', 'madre', 'madre', 'mãe', 'mère', ['okāsan', 'お母さん'], ['māma', '妈妈'], ['eomeoni', '어머니']],
+        ['Father', 'padre', 'padre', 'pai', 'père', ['otōsan', 'お父さん'], ['bàba', '爸爸'], ['abeoji', '아버지']],
+        ['Brother', 'hermano', 'fratello', 'irmão', 'frère', ['ani', '兄'], ['gēge', '哥哥'], ['hyeong', '형']],
+        ['Sister', 'hermana', 'sorella', 'irmã', 'sœur', ['ane', '姉'], ['jiějie', '姐姐'], ['eonni', '언니']],
+        ['Friend', 'amigo', 'amico', 'amigo', 'ami', ['tomodachi', '友達'], ['péngyou', '朋友'], ['chingu', '친구']],
+        ['Child', 'niño', 'bambino', 'criança', 'enfant', ['kodomo', '子供'], ['háizi', '孩子'], ['ai', '아이']],
+        ['Teacher', 'maestro', 'insegnante', 'professor', 'professeur', ['sensei', '先生'], ['lǎoshī', '老师'], ['seonsaengnim', '선생님']],
+        ['Doctor', 'médico', 'medico', 'médico', 'médecin', ['isha', '医者'], ['yīshēng', '医生'], ['uisa', '의사']],
+        ['King', 'rey', 're', 'rei', 'roi', ['ō', '王'], ['guówáng', '国王'], ['wang', '왕']],
+        ['Queen', 'reina', 'regina', 'rainha', 'reine', ['joō', '女王'], ['nǚwáng', '女王'], ['yeowang', '여왕']],
+        ['Love', 'amor', 'amore', 'amor', 'amour', ['ai', '愛'], ['ài', '爱'], ['sarang', '사랑']],
+      ],
+      'Home': [
+        ['House', 'casa', 'casa', 'casa', 'maison', ['ie', '家'], ['fángzi', '房子'], ['jip', '집']],
+        ['Door', 'puerta', 'porta', 'porta', 'porte', ['doa', 'ドア'], ['mén', '门'], ['mun', '문']],
+        ['Window', 'ventana', 'finestra', 'janela', 'fenêtre', ['mado', '窓'], ['chuānghu', '窗户'], ['changmun', '창문']],
+        ['Table', 'mesa', 'tavolo', 'mesa', 'table', ['tēburu', 'テーブル'], ['zhuōzi', '桌子'], ['takja', '탁자']],
+        ['Chair', 'silla', 'sedia', 'cadeira', 'chaise', ['isu', '椅子'], ['yǐzi', '椅子'], ['uija', '의자']],
+        ['Bed', 'cama', 'letto', 'cama', 'lit', ['beddo', 'ベッド'], ['chuáng', '床'], ['chimdae', '침대']],
+        ['Key', 'llave', 'chiave', 'chave', 'clé', ['kagi', '鍵'], ['yàoshi', '钥匙'], ['yeolsoe', '열쇠']],
+        ['Book', 'libro', 'libro', 'livro', 'livre', ['hon', '本'], ['shū', '书'], ['chaek', '책']],
+        ['Clock', 'reloj', 'orologio', 'relógio', 'horloge', ['tokei', '時計'], ['zhōng', '钟'], ['sigye', '시계']],
+        ['Mirror', 'espejo', 'specchio', 'espelho', 'miroir', ['kagami', '鏡'], ['jìngzi', '镜子'], ['geoul', '거울']],
+      ],
+      'Travel': [
+        ['Car', 'coche', 'macchina', 'carro', 'voiture', ['kuruma', '車'], ['qìchē', '汽车'], ['jadongcha', '자동차']],
+        ['Train', 'tren', 'treno', 'trem', 'train', ['densha', '電車'], ['huǒchē', '火车'], ['gicha', '기차']],
+        ['Boat', 'barco', 'barca', 'barco', 'bateau', ['fune', '船'], ['chuán', '船'], ['bae', '배']],
+        ['Bicycle', 'bicicleta', 'bicicletta', 'bicicleta', 'vélo', ['jitensha', '自転車'], ['zìxíngchē', '自行车'], ['jajeongeo', '자전거']],
+        ['Airplane', 'avión', 'aereo', 'avião', 'avion', ['hikōki', '飛行機'], ['fēijī', '飞机'], ['bihaenggi', '비행기']],
+        ['Street', 'calle', 'strada', 'rua', 'rue', ['michi', '道'], ['jiē', '街'], ['gil', '길']],
+        ['School', 'escuela', 'scuola', 'escola', 'école', ['gakkō', '学校'], ['xuéxiào', '学校'], ['hakgyo', '학교']],
+        ['Hospital', 'hospital', 'ospedale', 'hospital', 'hôpital', ['byōin', '病院'], ['yīyuàn', '医院'], ['byeongwon', '병원']],
+        ['Money', 'dinero', 'soldi', 'dinheiro', 'argent', ['okane', 'お金'], ['qián', '钱'], ['don', '돈']],
+        ['Bridge', 'puente', 'ponte', 'ponte', 'pont', ['hashi', '橋'], ['qiáo', '桥'], ['dari', '다리']],
+      ],
+      'Day and Night': [
+        ['Day', 'día', 'giorno', 'dia', 'jour', ['hi', '日'], ['tiān', '天'], ['nal', '날']],
+        ['Night', 'noche', 'notte', 'noite', 'nuit', ['yoru', '夜'], ['wǎnshang', '晚上'], ['bam', '밤']],
+        ['Morning', 'mañana', 'mattina', 'manhã', 'matin', ['asa', '朝'], ['zǎoshang', '早上'], ['achim', '아침']],
+        ['Year', 'año', 'anno', 'ano', 'année', ['toshi', '年'], ['nián', '年'], ['hae', '해']],
+        ['Week', 'semana', 'settimana', 'semana', 'semaine', ['shū', '週'], ['xīngqī', '星期'], ['ju', '주']],
+        ['Dream', 'sueño', 'sogno', 'sonho', 'rêve', ['yume', '夢'], ['mèng', '梦'], ['kkum', '꿈']],
+        ['Song', 'canción', 'canzone', 'canção', 'chanson', ['uta', '歌'], ['gē', '歌'], ['norae', '노래']],
+        ['Music', 'música', 'musica', 'música', 'musique', ['ongaku', '音楽'], ['yīnyuè', '音乐'], ['eumak', '음악']],
+      ],
+      'Colours': [
+        ['Red', 'rojo', 'rosso', 'vermelho', 'rouge', ['aka', '赤'], ['hóngsè', '红色'], ['ppalgang', '빨강']],
+        ['Blue', 'azul', 'blu', 'azul', 'bleu', ['ao', '青'], ['lánsè', '蓝色'], ['parang', '파랑']],
+        ['Green', 'verde', 'verde', 'verde', 'vert', ['midori', '緑'], ['lǜsè', '绿色'], ['choroksaek', '초록색']],
+        ['White', 'blanco', 'bianco', 'branco', 'blanc', ['shiro', '白'], ['báisè', '白色'], ['huinsaek', '흰색']],
+        ['Black', 'negro', 'nero', 'preto', 'noir', ['kuro', '黒'], ['hēisè', '黑色'], ['geomjeong', '검정']],
+        ['Yellow', 'amarillo', 'giallo', 'amarelo', 'jaune', ['kiiro', '黄色'], ['huángsè', '黄色'], ['norang', '노랑']],
+      ],
+      'Clothes': [
+        ['Shoe', 'zapato', 'scarpa', 'sapato', 'chaussure', ['kutsu', '靴'], ['xié', '鞋'], ['sinbal', '신발']],
+        ['Hat', 'sombrero', 'cappello', 'chapéu', 'chapeau', ['bōshi', '帽子'], ['màozi', '帽子'], ['moja', '모자']],
+        ['Shirt', 'camisa', 'camicia', 'camisa', 'chemise', ['shatsu', 'シャツ'], ['chènshān', '衬衫'], ['syeocheu', '셔츠']],
+        ['Dress', 'vestido', 'vestito', 'vestido', 'robe', ['doresu', 'ドレス'], ['liányīqún', '连衣裙'], ['deureseu', '드레스']],
+        ['Bag', 'bolso', 'borsa', 'bolsa', 'sac', ['kaban', 'かばん'], ['bāo', '包'], ['gabang', '가방']],
+        ['Umbrella', 'paraguas', 'ombrello', 'guarda-chuva', 'parapluie', ['kasa', '傘'], ['sǎn', '伞'], ['usan', '우산']],
+        ['Glove', 'guante', 'guanto', 'luva', 'gant', ['tebukuro', '手袋'], ['shǒutào', '手套'], ['janggap', '장갑']],
+      ],
+      'Post Office': [
+        ['Pen', 'bolígrafo', 'penna', 'caneta', 'stylo', ['pen', 'ペン'], ['bǐ', '笔'], ['pen', '펜']],
+        ['Paper', 'papel', 'carta', 'papel', 'papier', ['kami', '紙'], ['zhǐ', '纸'], ['jongi', '종이']],
+        ['Letter', 'carta', 'lettera', 'carta', 'lettre', ['tegami', '手紙'], ['xìn', '信'], ['pyeonji', '편지']],
+        ['Phone', 'teléfono', 'telefono', 'telefone', 'téléphone', ['denwa', '電話'], ['diànhuà', '电话'], ['jeonhwa', '전화']],
+        ['Gift', 'regalo', 'regalo', 'presente', 'cadeau', ['purezento', 'プレゼント'], ['lǐwù', '礼物'], ['seonmul', '선물']],
+      ],
+      'Numbers': [
+        ['One', 'uno', 'uno', 'um', 'un', ['ichi', '一'], ['yī', '一'], ['hana', '하나']],
+        ['Two', 'dos', 'due', 'dois', 'deux', ['ni', '二'], ['èr', '二'], ['dul', '둘']],
+        ['Three', 'tres', 'tre', 'três', 'trois', ['san', '三'], ['sān', '三'], ['set', '셋']],
+        ['Four', 'cuatro', 'quattro', 'quatro', 'quatre', ['yon', '四'], ['sì', '四'], ['net', '넷']],
+        ['Five', 'cinco', 'cinque', 'cinco', 'cinq', ['go', '五'], ['wǔ', '五'], ['daseot', '다섯']],
+        ['Six', 'seis', 'sei', 'seis', 'six', ['roku', '六'], ['liù', '六'], ['yeoseot', '여섯']],
+        ['Ten', 'diez', 'dieci', 'dez', 'dix', ['jū', '十'], ['shí', '十'], ['yeol', '열']],
+      ],
+    },
+  };
+});
+</script>
+  <script>
+// Turns a puzzle definition (4 English hints) into a playable puzzle in the languages the player picked.
+//
+// settings: { langs: ['es', 'ja', ...] (at least 3), native: { ja: bool, zh: bool, ko: bool } }
+//
+// Rules for every built puzzle:
+//  - each face shows its hint in 3 different languages, and the picked languages are spread evenly over the faces;
+//  - no two words in a puzzle look alike, even ignoring accents and case ("sān" vs "san", "tè" vs "té"),
+//    and no word is spelled like a hint (e.g. French "lion" for Lion). The one exception: when the picked
+//    languages leave no other choice, a face may show the same word twice from two languages (Spanish and
+//    Portuguese "gato" on Cat), and, failing that, a word may be spelled like its own hint. A word never
+//    appears on two different faces;
+//  - hidden words are translations of words from other themes and never match any translation of the hints,
+//    so a hidden word can't pass for a real answer.
+// So each piece fits exactly one corner, one way (the tests check this for every language choice).
+// The result is the same every time for the same puzzle and settings (it's seeded by both).
+// A puzzle that can't be built with the picked languages (too many look-alikes) returns null.
+(function (root, factory) {
+  const b = factory(typeof module === 'object' && module.exports ? require('./dictionary') : root.DICTIONARY);
+  if (typeof module === 'object' && module.exports) module.exports = b;
+  else root.LangBuilder = b;
+})(typeof self !== 'undefined' ? self : this, function (DICT) {
+  const FACES = ['Front', 'Left', 'Right', 'Base'];
+  const LANGS = DICT.languages;
+  const CODES = LANGS.map((l) => l.code);
+  const SCRIPTED = LANGS.filter((l) => l.native).map((l) => l.code); // languages with a non-Latin script
+  const MIN_LANGS = 3;
+
+  const ENTRIES = new Map(); // English -> { en, category, row }
+  for (const [category, rows] of Object.entries(DICT.categories)) {
+    for (const row of rows) ENTRIES.set(row[0], { en: row[0], category, row });
+  }
+
+  // Comparison key: accents, case, spaces and punctuation ignored. Non-Latin scripts compare as written.
+  const key = (w) => w.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[\s'’.\-]/g, '');
+
+  function wordOf(entry, code, settings) {
+    const cell = entry.row[1 + CODES.indexOf(code)];
+    return Array.isArray(cell) ? cell[settings.native && settings.native[code] ? 1 : 0] : cell;
+  }
+
+  function normalizeSettings(s) {
+    const langs = CODES.filter((c) => s && Array.isArray(s.langs) && s.langs.includes(c));
+    const native = {};
+    for (const c of SCRIPTED) native[c] = !!(s && s.native && s.native[c]);
+    return { langs: langs.length >= MIN_LANGS ? langs : [...CODES], native };
+  }
+
+  // Short stable id for a set of settings, e.g. "es.fr.ja*.ko" (* = native script). Best times are kept per signature.
+  function signature(settings) {
+    return settings.langs.map((c) => (settings.native[c] ? `${c}*` : c)).join('.');
+  }
+
+  function hashString(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+    return h >>> 0;
+  }
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function make(def, rawSettings) {
+    const settings = normalizeSettings(rawSettings);
+    const entries = def.hints.map((h) => ENTRIES.get(h));
+    if (entries.some((e) => !e)) throw new Error(`${def.id}: hint not in the dictionary`);
+    const rand = mulberry32(hashString(`${def.id}|${signature(settings)}`));
+    const shuffle = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const hintKeys = entries.map((e) => key(e.en));
+
+    // Hidden-word candidates: words from themes none of the hints belong to.
+    const hintCats = new Set(entries.map((e) => e.category));
+    const others = [...ENTRIES.values()].filter((e) => !hintCats.has(e.category));
+    // Every spelling of every hint, in every language and script, is off limits for hidden words.
+    const hintSpellings = new Set(hintKeys);
+    for (const e of entries) for (const cell of e.row.slice(1)) for (const w of [].concat(cell)) hintSpellings.add(key(w));
+
+    for (let attempt = 0; attempt < 200; attempt++) {
+      const usage = Object.fromEntries(settings.langs.map((c) => [c, 0]));
+      const taken = new Set(hintKeys);
+      const faces = [];
+      let ok = true;
+      // Fill the faces in a random order so that a tight face doesn't always get the leftovers.
+      for (const k of shuffle([0, 1, 2, 3])) {
+        // Least-used languages first (random among equals), so all picked languages get used.
+        const order = shuffle(settings.langs).sort((a, b) => usage[a] - usage[b]);
+        const chosen = [];
+        const local = new Set();
+        // First pass: 3 different-looking words. Second pass, only if that's impossible (e.g. Spanish and
+        // Portuguese both say "gato"): let the same word repeat on this face, from different languages.
+        // Last resort, for the same reason: a word spelled like its own hint (French "train" for Train).
+        for (const pass of [0, 1, 2]) {
+          for (const code of order) {
+            if (chosen.length === 3 || chosen.some((c) => c.lang === code)) continue;
+            const word = wordOf(entries[k], code, settings);
+            const kw = key(word);
+            const ownHint = kw === hintKeys[k];
+            if ((taken.has(kw) && !(pass === 2 && ownHint)) || (pass === 0 && local.has(kw))) continue;
+            chosen.push({ lang: code, word });
+            local.add(kw);
+          }
+        }
+        if (chosen.length < 3) { ok = false; break; }
+        for (const c of chosen) { usage[c.lang]++; taken.add(key(c.word)); }
+        faces[k] = shuffle(chosen);
+      }
+      if (!ok) continue;
+
+      const hidden = [];
+      for (let guard = 0; hidden.length < 4 && guard < 500; guard++) {
+        const e = others[Math.floor(rand() * others.length)];
+        const code = shuffle(settings.langs).sort((a, b) => usage[a] - usage[b])[0];
+        const word = wordOf(e, code, settings);
+        const kw = key(word);
+        if (taken.has(kw) || hintSpellings.has(kw) || kw.length < 2 && !/[^\x00-\x7f]/.test(kw)) continue;
+        taken.add(kw);
+        usage[code]++;
+        hidden.push({ lang: code, word, en: e.en });
+      }
+      if (hidden.length < 4) continue;
+
+      return {
+        id: def.id,
+        title: def.title,
+        signature: signature(settings),
+        hints: Object.fromEntries(FACES.map((f, k) => [f, entries[k].en])),
+        words: Object.fromEntries(FACES.map((f, k) => [f, faces[k].map((c) => c.word)])),
+        langs: Object.fromEntries(FACES.map((f, k) => [f, faces[k].map((c) => c.lang)])),
+        hidden: hidden.map((h) => h.word),
+        hiddenInfo: hidden,
+      };
+    }
+    return null;
+  }
+
+  return { LANGS, CODES, SCRIPTED, MIN_LANGS, ENTRIES, key, wordOf, normalizeSettings, signature, make };
+});
+</script>
+  <script>
+// The puzzles. Each one names 4 English words from public/dictionary.js, one hint per big face
+// in the order [Front, Left, Right, Base]. The words on the pieces are filled in when the puzzle is opened,
+// from the languages the player picked (see public/language-builder.js).
+(function (root, factory) {
+  const p = factory();
+  if (typeof module === 'object' && module.exports) module.exports = p;
+  else root.PUZZLES = p;
+})(typeof self !== 'undefined' ? self : this, function () {
+  return [
+    { id: 'l01', title: 'First Words', hints: ['Cat', 'Dog', 'Water', 'Bread'] },
+    { id: 'l02', title: 'Up Above', hints: ['Sun', 'Moon', 'Star', 'Sky'] },
+    { id: 'l03', title: 'Everyday Places', hints: ['Book', 'House', 'School', 'Friend'] },
+    { id: 'l04', title: 'Colour Wheel', hints: ['Red', 'Blue', 'Green', 'White'] },
+    { id: 'l05', title: 'Grocery List', hints: ['Apple', 'Fish', 'Milk', 'Egg'] },
+    { id: 'l06', title: 'Great Outdoors', hints: ['Flower', 'Tree', 'River', 'Mountain'] },
+    { id: 'l07', title: 'The Elements', hints: ['Rain', 'Snow', 'Wind', 'Fire'] },
+    { id: 'l08', title: 'On the Move', hints: ['Car', 'Train', 'Boat', 'Bicycle'] },
+    { id: 'l09', title: 'Family Tree', hints: ['Mother', 'Father', 'Brother', 'Sister'] },
+    { id: 'l10', title: 'At the Table', hints: ['Cheese', 'Rice', 'Tea', 'Wine'] },
+    { id: 'l11', title: 'Body Language', hints: ['Hand', 'Eye', 'Heart', 'Head'] },
+    { id: 'l12', title: 'Time Flies', hints: ['Love', 'Night', 'Morning', 'Year'] },
+    { id: 'l13', title: 'Animals I', hints: ['Pig', 'Monkey', 'Rabbit', 'Snake'] },
+    { id: 'l14', title: 'Food I', hints: ['Grape', 'Orange', 'Salt', 'Sugar'] },
+    { id: 'l15', title: 'Nature I', hints: ['Island', 'Star', 'Stone', 'Tree'] },
+    { id: 'l16', title: 'Weather I', hints: ['Wind', 'Fire', 'Winter', 'Rain'] },
+    { id: 'l17', title: 'Body I', hints: ['Mouth', 'Nose', 'Ear', 'Heart'] },
+    { id: 'l18', title: 'People I', hints: ['Mother', 'Teacher', 'Queen', 'Father'] },
+    { id: 'l19', title: 'Home I', hints: ['Clock', 'Key', 'Bed', 'Chair'] },
+    { id: 'l20', title: 'Travel I', hints: ['Train', 'Money', 'Airplane', 'Hospital'] },
+    { id: 'l21', title: 'Drinks I', hints: ['Wine', 'Tea', 'Water', 'Beer'] },
+    { id: 'l22', title: 'Day and Night I', hints: ['Song', 'Day', 'Week', 'Year'] },
+    { id: 'l23', title: 'Colours I', hints: ['Black', 'Green', 'Red', 'Yellow'] },
+    { id: 'l24', title: 'Clothes I', hints: ['Umbrella', 'Shoe', 'Shirt', 'Bag'] },
+    { id: 'l25', title: 'Numbers I', hints: ['Four', 'One', 'Three', 'Six'] },
+    { id: 'l26', title: 'Post Office', hints: ['Letter', 'Phone', 'Gift', 'Pen'] },
+    { id: 'l27', title: 'Animals II', hints: ['Horse', 'Elephant', 'Lion', 'Dog'] },
+    { id: 'l28', title: 'Food II', hints: ['Cheese', 'Apple', 'Egg', 'Meat'] },
+    { id: 'l29', title: 'Nature II', hints: ['Flower', 'Cloud', 'Sun', 'Sea'] },
+    { id: 'l30', title: 'Weather II', hints: ['Snow', 'Summer', 'Autumn', 'Light'] },
+    { id: 'l31', title: 'Body II', hints: ['Eye', 'Hair', 'Head', 'Tooth'] },
+    { id: 'l32', title: 'People II', hints: ['Friend', 'Sister', 'Doctor', 'Brother'] },
+    { id: 'l33', title: 'Home II', hints: ['Window', 'House', 'Book', 'Door'] },
+    { id: 'l34', title: 'Travel II', hints: ['School', 'Boat', 'Bicycle', 'Bridge'] },
+    { id: 'l35', title: 'Drinks II', hints: ['Milk', 'Coffee', 'Juice', 'Water'] },
+    { id: 'l36', title: 'Day and Night II', hints: ['Night', 'Music', 'Morning', 'Dream'] },
+    { id: 'l37', title: 'Colours II', hints: ['White', 'Blue', 'Red', 'Yellow'] },
+    { id: 'l38', title: 'Clothes II', hints: ['Dress', 'Glove', 'Hat', 'Shirt'] },
+    { id: 'l39', title: 'Numbers II', hints: ['Ten', 'Two', 'Five', 'One'] },
+    { id: 'l40', title: 'Animals III', hints: ['Cat', 'Mouse', 'Cow', 'Bear'] },
+    { id: 'l41', title: 'Food III', hints: ['Rice', 'Strawberry', 'Cake', 'Soup'] },
+    { id: 'l42', title: 'Nature III', hints: ['Moon', 'River', 'Mountain', 'Sky'] },
+    { id: 'l43', title: 'Weather III', hints: ['Spring', 'Winter', 'Rain', 'Fire'] },
+    { id: 'l44', title: 'Body III', hints: ['Hand', 'Foot', 'Head', 'Tooth'] },
+    { id: 'l45', title: 'People III', hints: ['King', 'Child', 'Mother', 'Sister'] },
+    { id: 'l46', title: 'Home III', hints: ['Mirror', 'Table', 'Clock', 'Chair'] },
+    { id: 'l47', title: 'Travel III', hints: ['Street', 'Car', 'Train', 'School'] },
+    { id: 'l48', title: 'Animals IV', hints: ['Bird', 'Fish', 'Bear', 'Dog'] },
+    { id: 'l49', title: 'Food IV', hints: ['Bread', 'Meat', 'Sugar', 'Strawberry'] },
+    { id: 'l50', title: 'Nature IV', hints: ['Island', 'Moon', 'River', 'Cloud'] },
+    { id: 'l51', title: 'Breakfast', hints: ['Coffee', 'Bread', 'Egg', 'Juice'] },
+    { id: 'l52', title: 'Farmyard', hints: ['Horse', 'Cow', 'Pig', 'Milk'] },
+    { id: 'l53', title: 'Jungle', hints: ['Monkey', 'Snake', 'Elephant', 'Tree'] },
+    { id: 'l54', title: 'Seaside', hints: ['Sea', 'Boat', 'Fish', 'Island'] },
+    { id: 'l55', title: 'Bedtime', hints: ['Bed', 'Night', 'Dream', 'Moon'] },
+    { id: 'l56', title: 'Royal Court', hints: ['King', 'Queen', 'Money', 'Dress'] },
+    { id: 'l57', title: 'Four Seasons', hints: ['Spring', 'Summer', 'Autumn', 'Winter'] },
+    { id: 'l58', title: 'Fruit Bowl', hints: ['Apple', 'Orange', 'Grape', 'Strawberry'] },
+    { id: 'l59', title: 'Face to Face', hints: ['Eye', 'Nose', 'Mouth', 'Ear'] },
+    { id: 'l60', title: 'Rainy Day', hints: ['Rain', 'Umbrella', 'Cloud', 'Shoe'] },
+    { id: 'l61', title: 'Counting', hints: ['Two', 'Three', 'Five', 'Ten'] },
+    { id: 'l62', title: 'Dark and Light', hints: ['Black', 'White', 'Light', 'Night'] },
+    { id: 'l63', title: 'City Streets', hints: ['Street', 'Bridge', 'Car', 'Hospital'] },
+    { id: 'l64', title: 'Classroom', hints: ['School', 'Teacher', 'Book', 'Pen'] },
+    { id: 'l65', title: 'Sweet Tooth', hints: ['Cake', 'Sugar', 'Tooth', 'Doctor'] },
+    { id: 'l66', title: 'Wardrobe', hints: ['Shirt', 'Dress', 'Shoe', 'Glove'] },
+    { id: 'l67', title: 'Picnic', hints: ['Bread', 'Cheese', 'Wine', 'Grape'] },
+    { id: 'l68', title: 'Night Sky', hints: ['Star', 'Moon', 'Night', 'Cloud'] },
+    { id: 'l69', title: 'Keeping in Touch', hints: ['Phone', 'Paper', 'Gift', 'Friend'] },
+    { id: 'l70', title: 'Front Door', hints: ['Door', 'Key', 'House', 'Window'] },
+    { id: 'l71', title: 'Pets', hints: ['Cat', 'Dog', 'Rabbit', 'Fish'] },
+    { id: 'l72', title: 'Wild Things', hints: ['Lion', 'Bear', 'Snake', 'Monkey'] },
+    { id: 'l73', title: 'Love Songs', hints: ['Music', 'Song', 'Heart', 'Love'] },
+    { id: 'l74', title: 'Kitchen Table', hints: ['Table', 'Salt', 'Soup', 'Rice'] },
+    { id: 'l75', title: 'Mountain Trail', hints: ['Mountain', 'Stone', 'River', 'Snow'] },
+    { id: 'l76', title: 'Garden', hints: ['Flower', 'Tree', 'Sun', 'Bird'] },
+    { id: 'l77', title: 'Rush Hour', hints: ['Train', 'Car', 'Bicycle', 'Clock'] },
+    { id: 'l78', title: 'Paint Box', hints: ['Red', 'Blue', 'Yellow', 'Green'] },
+    { id: 'l79', title: 'Head to Toe', hints: ['Head', 'Hair', 'Foot', 'Hand'] },
+    { id: 'l80', title: 'Family Dinner', hints: ['Mother', 'Father', 'Child', 'Meat'] },
+    { id: 'l81', title: 'Hot Drinks', hints: ['Tea', 'Coffee', 'Milk', 'Sugar'] },
+    { id: 'l82', title: 'Party', hints: ['Beer', 'Cake', 'Music', 'Friend'] },
+    { id: 'l83', title: 'Weekend', hints: ['Week', 'Day', 'Morning', 'Coffee'] },
+    { id: 'l84', title: 'Shopping', hints: ['Money', 'Bag', 'Shoe', 'Hat'] },
+    { id: 'l85', title: 'Getting Around', hints: ['Airplane', 'Boat', 'Train', 'Bicycle'] },
+    { id: 'l86', title: 'Wintertime', hints: ['Winter', 'Snow', 'Glove', 'Fire'] },
+    { id: 'l87', title: 'Summertime', hints: ['Summer', 'Sun', 'Sea', 'Hat'] },
+    { id: 'l88', title: 'Autumn Leaves', hints: ['Autumn', 'Tree', 'Wind', 'Orange'] },
+    { id: 'l89', title: 'Hospital Visit', hints: ['Hospital', 'Doctor', 'Heart', 'Flower'] },
+    { id: 'l90', title: 'Reading Nook', hints: ['Book', 'Chair', 'Light', 'Tea'] },
+    { id: 'l91', title: 'Mirror, Mirror', hints: ['Mirror', 'Queen', 'Hair', 'Eye'] },
+    { id: 'l92', title: 'Small Numbers', hints: ['One', 'Two', 'Four', 'Six'] },
+    { id: 'l93', title: 'Siblings', hints: ['Brother', 'Sister', 'Friend', 'Child'] },
+    { id: 'l94', title: 'Mouse House', hints: ['Mouse', 'Cat', 'Cheese', 'House'] },
+    { id: 'l95', title: 'River Crossing', hints: ['River', 'Bridge', 'Boat', 'Stone'] },
+    { id: 'l96', title: 'Bright Colours', hints: ['White', 'Yellow', 'Green', 'Blue'] },
+    { id: 'l97', title: 'Valentine', hints: ['Love', 'Heart', 'Gift', 'Flower'] },
+    { id: 'l98', title: 'Big Animals', hints: ['Elephant', 'Lion', 'Horse', 'Bird'] },
+    { id: 'l99', title: 'Timekeeper', hints: ['Clock', 'Year', 'Week', 'Day'] },
+    { id: 'l100', title: 'Grand Finale', hints: ['Star', 'Fire', 'Light', 'Sky'] },
+  ];
+});
+</script>
+  <script>
+// Puzzle logic shared by the browser and the tests: build a puzzle's pieces, scramble them, check answers.
+(function (root, factory) {
+  const core = factory(typeof module === 'object' && module.exports ? require('./geometry') : root.Geo);
+  if (typeof module === 'object' && module.exports) module.exports = core;
+  else root.PuzzleCore = core;
+})(typeof self !== 'undefined' ? self : this, function (Geo) {
+  const FACE_INDEX = { Base: 0, Front: 1, Left: 2, Right: 3 };
+  // Corner (slot) order of each face's word list in puzzles.js, keyed by face index.
+  const DATA_SLOTS = { 1: [0, 2, 3], 2: [0, 1, 3], 3: [0, 1, 2], 0: [1, 2, 3] };
+
+  // Solved form: solution[s][d] = word showing toward world direction d at corner s (d === s is hidden).
+  function build(p) {
+    const hints = [];
+    const solution = [0, 1, 2, 3].map(() => []);
+    for (const [name, d] of Object.entries(FACE_INDEX)) {
+      hints[d] = p.hints[name];
+      DATA_SLOTS[d].forEach((s, i) => { solution[s][d] = p.words[name][i]; });
+    }
+    p.hidden.forEach((w, s) => { solution[s][s] = w; });
+    return { hints, solution };
+  }
+
+  // Pieces in a random order, each with its words rotated by a random orientation, so a piece
+  // dropped into a corner with orientation 0 is almost never already right.
+  function scramble(built, rand = Math.random) {
+    const pick = (n) => Math.floor(rand() * n);
+    const cards = built.solution.map((words, s) => {
+      const P = Geo.PERM[pick(Geo.ORIENTS)];
+      return { id: `k${s}`, words: [0, 1, 2, 3].map((l) => words[P[l]]) };
+    });
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = pick(i + 1);
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    return cards;
+  }
+
+  // A piece is right when its 3 outward words match the solution for that corner.
+  function isCorrect(built, slot, card, orient) {
+    return Geo.OUTWARD[slot].every((d) => Geo.wordOn(card.words, orient, d) === built.solution[slot][d]);
+  }
+
+  function validate(p) {
+    const errors = [];
+    // A word may repeat on one face (two languages can spell it the same), but never across faces or hidden words.
+    const groups = [...Object.values(p.words).map((ws) => [...new Set(ws.map((w) => w.toLowerCase()))]), ...p.hidden.map((w) => [w.toLowerCase()])];
+    const seen = new Set();
+    for (const k of groups.flat()) {
+      if (seen.has(k)) errors.push(`word "${k}" is in two places`);
+      seen.add(k);
+    }
+    for (const name of Object.keys(FACE_INDEX)) {
+      if (!p.hints[name]) errors.push(`missing hint for ${name}`);
+      if (!Array.isArray(p.words[name]) || p.words[name].length !== 3) errors.push(`${name} needs 3 words`);
+      // A word may be spelled like its own face's hint, never like another face's.
+      const own = (p.words[name] || []).map((w) => w.toLowerCase());
+      for (const other of Object.keys(FACE_INDEX)) {
+        if (other !== name && p.hints[other] && own.includes(p.hints[other].toLowerCase())) errors.push(`hint "${p.hints[other]}" is also a word on ${name}`);
+      }
+      if (p.hints[name] && p.hidden.some((w) => w.toLowerCase() === p.hints[name].toLowerCase())) errors.push(`hint "${p.hints[name]}" is hidden`);
+    }
+    if (!Array.isArray(p.hidden) || p.hidden.length !== 4) errors.push('needs 4 hidden words');
+    return errors;
+  }
+
+  return { FACE_INDEX, build, scramble, isCorrect, validate };
+});
+</script>
+  <script>
+'use strict';
+
+/* global Geo, PUZZLES, PuzzleCore, LangBuilder */
+const { VERTS, NORMALS, FACE_NAMES, FACE_ORDER, PERM, INV, OUTWARD, FACE_TRI, wordOn, twist, slotName, sub, dot, cross } = Geo;
+
+const PENALTY_SECONDS = 30;
+
+const app = document.getElementById('app');
+const topinfo = document.getElementById('topinfo');
+const toastEl = document.getElementById('toast');
+
+let game = null; // the puzzle being played (see openPuzzle)
+// Nothing is chosen by clicking: the active corner is always the one nearest the camera (see focusSlot),
+// whether it holds a piece or is empty. Tapping a pile piece puts it into that corner.
+
+// Camera for the 3D view (degrees). Default looks at the Front and Right faces from slightly above.
+const cam = { yaw: -40, pitch: 28 };
+const PERSPECTIVE = 1100;
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const f1 = (x) => x.toFixed(1);
+
+let toastTimer;
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3200);
+}
+
+// ---------------- language choice (per browser) ----------------
+
+// { langs: [codes], native: { ja, zh, ko } }. Default: every language, romanized.
+let settings = loadSettings();
+
+function loadSettings() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('wordknot-langs') || 'null'); } catch {}
+  return LangBuilder.normalizeSettings(saved || { langs: LangBuilder.CODES, native: {} });
+}
+function saveSettings() {
+  try { localStorage.setItem('wordknot-langs', JSON.stringify(settings)); } catch {}
+}
+
+function toggleLang(code) {
+  const on = settings.langs.includes(code);
+  if (on && settings.langs.length <= LangBuilder.MIN_LANGS) {
+    toast(`Pick at least ${LangBuilder.MIN_LANGS} languages.`);
+    return;
+  }
+  const langs = on ? settings.langs.filter((c) => c !== code) : [...settings.langs, code];
+  settings = LangBuilder.normalizeSettings({ ...settings, langs });
+  saveSettings();
+  render();
+}
+
+function setScript(code, native) {
+  settings = LangBuilder.normalizeSettings({ ...settings, native: { ...settings.native, [code]: native } });
+  saveSettings();
+  render();
+}
+
+function langLabel(code) {
+  const l = LangBuilder.LANGS.find((x) => x.code === code);
+  return l.native ? `${l.name} (${settings.native[code] ? l.native : l.roman})` : l.name;
+}
+
+// ---------------- best times (per browser) ----------------
+// Kept per puzzle and per language choice, since different languages make a different puzzle.
+
+const bestKey = (id) => `${id}@${LangBuilder.signature(settings)}`;
+function loadBest() {
+  try { return JSON.parse(localStorage.getItem('wordknot-best') || '{}') || {}; } catch { return {}; }
+}
+function saveBest(id, rec) {
+  const all = loadBest();
+  all[bestKey(id)] = rec;
+  try { localStorage.setItem('wordknot-best', JSON.stringify(all)); } catch {}
+}
+
+function fmtTime(ms) {
+  const t = Math.max(0, Math.floor(ms / 100));
+  const tenths = t % 10;
+  const secs = Math.floor(t / 10) % 60;
+  const mins = Math.floor(t / 600);
+  return `${mins}:${String(secs).padStart(2, '0')}.${tenths}`;
+}
+
+// ---------------- game state ----------------
+
+// def: an entry of PUZZLES. The words are filled in from the chosen languages.
+function openPuzzle(def) {
+  const p = LangBuilder.make(def, settings);
+  if (!p) { toast("That puzzle can't be made with these languages. Try adding another."); return; }
+  const built = PuzzleCore.build(p);
+  const cards = PuzzleCore.scramble(built);
+  game = {
+    puzzle: p,
+    built,
+    cards: Object.fromEntries(cards.map((c) => [c.id, c])),
+    order: cards.map((c) => c.id),
+    placement: [null, null, null, null], // {cardId, orient}
+    marks: [null, null, null, null], // result of the last check per corner: true / false / null
+    start: performance.now(),
+    penalty: 0, // seconds
+    checks: 0,
+    lastCheck: null,
+    solved: false,
+    finalMs: 0,
+    best: loadBest()[bestKey(p.id)] || null,
+    newBest: false,
+  };
+  history.replaceState(null, '', `#${p.id}`);
+  render();
+}
+
+function closePuzzle() {
+  game = null;
+  history.replaceState(null, '', location.pathname + location.search);
+  render();
+}
+
+function elapsedMs() {
+  if (!game) return 0;
+  if (game.solved) return game.finalMs;
+  return performance.now() - game.start + game.penalty * 1000;
+}
+
+// Each piece has its own colour, picked by its place in the shuffled pile order (not by its id, which follows
+// the solution and would give the answer away).
+const pieceCls = (cardId) => `p${game.order.indexOf(cardId)}`;
+
+function locate(cardId) {
+  return game.placement.findIndex((x) => x && x.cardId === cardId);
+}
+
+function clearMark(s) {
+  if (s >= 0) game.marks[s] = null;
+}
+
+function move(cardId, to) {
+  if (game.solved) return;
+  const from = locate(cardId);
+  if (to === 'pool') {
+    if (from >= 0) { game.placement[from] = null; clearMark(from); }
+  } else {
+    if (from === to) return;
+    const moving = from >= 0 ? game.placement[from] : { cardId, orient: 0 };
+    const displaced = game.placement[to];
+    game.placement[to] = moving;
+    if (from >= 0) game.placement[from] = displaced; // swap (or leave empty); from the pile, an occupant goes back
+    clearMark(from);
+    clearMark(to);
+  }
+  render();
+}
+
+function setOrient(slot, orient) {
+  if (game.solved || !game.placement[slot]) return;
+  game.placement[slot] = { ...game.placement[slot], orient };
+  game.marks[slot] = null;
+  render();
+}
+
+// Shortcut (triple-click the timer): put every piece in its right corner, turned the right way. You still press
+// Check to finish, and the time isn't saved as a best time.
+function placeAllCorrectly() {
+  if (game.solved) return;
+  game.placement = [0, 1, 2, 3].map((s) => {
+    for (const id of game.order) {
+      for (let o = 0; o < PERM.length; o++) if (PuzzleCore.isCorrect(game.built, s, game.cards[id], o)) return { cardId: id, orient: o };
+    }
+    return null;
+  });
+  game.marks = [null, null, null, null];
+  game.autoPlaced = true;
+  render();
+}
+
+function resetBoard() {
+  if (game.solved) return;
+  game.placement = [null, null, null, null];
+  game.marks = [null, null, null, null];
+  render();
+}
+
+function check() {
+  if (game.solved) return;
+  if (game.placement.some((x) => !x)) { toast('Place all 4 pieces first.'); return; }
+  const correct = game.placement.map((x, s) => PuzzleCore.isCorrect(game.built, s, game.cards[x.cardId], x.orient));
+  const wrong = correct.filter((ok) => !ok).length;
+  game.checks++;
+  if (wrong === 0) {
+    game.finalMs = performance.now() - game.start + game.penalty * 1000;
+    game.solved = true;
+    pendingCelebrate = true;
+    game.marks = correct;
+    clearTimeout(toastTimer);
+    toastEl.classList.remove('show');
+      if (!game.autoPlaced && (!game.best || game.finalMs < game.best.time)) {
+      game.newBest = true;
+      game.best = { time: game.finalMs, checks: game.checks, date: new Date().toISOString() };
+      saveBest(game.puzzle.id, game.best);
+    }
+  } else {
+    game.penalty += PENALTY_SECONDS;
+    game.marks = correct;
+    game.lastCheck = { wrong };
+    toast(`${wrong} piece${wrong === 1 ? ' is' : 's are'} wrong: +${PENALTY_SECONDS}s`);
+  }
+  render();
+}
+
+// ---------------- sizing ----------------
+
+function sizes() {
+  const w = window.innerWidth;
+  const narrow = w < 760;
+  return {
+    R: narrow ? clamp(Math.floor(((w - 48) / 2 - 50) / 1.12), 70, 170) : 170, // big tetrahedron circumradius (px)
+  };
+}
+
+// Font size that fits `word` in `width`. Wide characters (kana, kanji, hangul) count as about 1em, others 0.6em.
+function fitFont(word, width, max) {
+  const units = [...word].reduce((a, ch) => a + (ch.codePointAt(0) >= 0x1100 ? 1 : 0.6), 0);
+  return f1(Math.min(max, width / Math.max(units, 1.8)));
+}
+
+// ---------------- 3D math ----------------
+
+function camMatrix() {
+  const p = (cam.pitch * Math.PI) / 180;
+  const y = (cam.yaw * Math.PI) / 180;
+  const cp = Math.cos(p), sp = Math.sin(p), cy = Math.cos(y), sy = Math.sin(y);
+  // M = Rx(pitch) * Ry(yaw), in world coordinates (y up)
+  return [
+    [cy, 0, sy],
+    [sp * sy, cp, -sp * cy],
+    [-cp * sy, sp, cp * cy],
+  ];
+}
+
+// World (y up) matrix -> CSS matrix3d (y down): F*M*F with F = diag(1,-1,1).
+function cssMatrix(M) {
+  const f = [1, -1, 1];
+  const A = M.map((row, i) => row.map((v, j) => v * f[i] * f[j]));
+  return `matrix3d(${A[0][0]},${A[1][0]},${A[2][0]},0,${A[0][1]},${A[1][1]},${A[2][1]},0,${A[0][2]},${A[1][2]},${A[2][2]},0,0,0,0,1)`;
+}
+
+const apply = (M, v) => M.map((r) => r[0] * v[0] + r[1] * v[1] + r[2] * v[2]);
+const toCss = (p) => [p[0], -p[1], p[2]];
+const scale = (v, k) => v.map((x) => x * k);
+const add = (a, b) => a.map((x, i) => x + b[i]);
+const len = (v) => Math.hypot(v[0], v[1], v[2]);
+
+// Map a W x H triangle element (apex top-centre, base along the bottom) onto 3D points T, BL, BR (world px).
+// The element's front faces `normal`; T/BL/BR are swapped if needed so it never shows mirrored.
+function triTransform(T, BL, BR, normal) {
+  let [t, bl, br] = [T, BL, BR].map(toCss);
+  const n = toCss(normal);
+  const frame = () => {
+    const W = len(sub(br, bl));
+    const mid = scale(add(bl, br), 0.5);
+    const H = len(sub(mid, t));
+    const ex = scale(sub(br, bl), 1 / W);
+    const ey = scale(sub(mid, t), 1 / H);
+    return { W, H, ex, ey, ez: cross(ex, ey) };
+  };
+  let fr = frame();
+  if (dot(fr.ez, n) < 0) { [bl, br] = [br, bl]; fr = frame(); }
+  const { W, H, ex, ey, ez } = fr;
+  const O = sub(bl, scale(ey, H));
+  const m = [...ex, 0, ...ey, 0, ...ez, 0, ...O, 1].map((x) => +x.toFixed(4));
+  return { W, H, css: `matrix3d(${m.join(',')})` };
+}
+
+function applyCamera() {
+  const M = camMatrix();
+  const css = cssMatrix(M);
+  document.querySelectorAll('.scene .shape3d').forEach((el) => { el.style.transform = css; });
+  updateFocus();
+}
+
+// ---------------- rendering helpers ----------------
+
+function triSvg(W, H) {
+  return `<svg class="tri" viewBox="0 0 ${f1(W)} ${f1(H)}" preserveAspectRatio="none"><polygon points="${f1(W / 2)},2 ${f1(W - 1.5)},${f1(H - 1)} 1.5,${f1(H - 1)}"/></svg>`;
+}
+
+// The base's triangle has its corner at the back, so its words are turned 180° to read upright
+// when you tilt the shape to look up at it from the front (front edge at the top).
+const BASE = 0;
+
+const markCls = (marks, s) => (marks && marks[s] === true ? 'ok' : marks && marks[s] === false ? 'bad' : '');
+
+// The corner nearest the camera plane (largest depth toward the viewer), filled or empty.
+function focusSlot() {
+  if (!game || game.solved) return -1;
+  const M = camMatrix();
+  let best = -1;
+  let bestZ = -Infinity;
+  game.placement.forEach((x, s) => {
+    const z = apply(M, VERTS[s])[2];
+    if (z > bestZ + 1e-9) { bestZ = z; best = s; }
+  });
+  return best;
+}
+
+// After the camera moves: if a different piece is now nearest, update highlights and the panel in place
+// (no full re-render, so dragging the view stays smooth).
+function updateFocus() {
+  if (!game || game.solved) return;
+  const f = focusSlot();
+  if (f === game.focus) return;
+  game.focus = f;
+  app.querySelectorAll('.scene .tpiece').forEach((el) => {
+    const s = Number(el.dataset.hover);
+    el.classList.toggle('sel', s === f);
+    el.classList.toggle('faded', s !== f && f >= 0);
+  });
+  const panel = document.getElementById('inspector');
+  if (panel) { panel.innerHTML = inspectorHTML(f); slideHidden(); }
+  const ctl = document.getElementById('scenectl');
+  if (ctl) ctl.innerHTML = sceneControlsHTML(f);
+}
+
+// slots: array of 4 ({card, orient} | null)
+function tetraHTML({ slots, hints, interactive = false, marks = null, focus = -1, controls = '' }) {
+  const { R } = sizes();
+  const layer = () => {
+    const pieces = [0, 1, 2, 3].map((s) => {
+      const item = slots[s];
+      const centre = scale(VERTS[s], R / 2);
+      // Corners of the piece at slot s, shrunk slightly toward its centre to leave a visible seam.
+      const pv = VERTS.map((v) => {
+        const q = scale(add(VERTS[s], v), R / 2);
+        return add(centre, scale(sub(q, centre), 0.955));
+      });
+      const faces = [0, 1, 2, 3].map((d) => {
+        if (d === s) {
+          // Inner side, facing the hollow centre, with the hidden word. Normally out of sight, but drawn like
+          // the other sides so nothing is blank when a piece turns (e.g. the spin on a correct answer).
+          if (!item) return '';
+          const [a, b, c] = OUTWARD[s];
+          const t = triTransform(pv[a], pv[b], pv[c], NORMALS[s]);
+          const w = wordOn(item.card.words, item.orient, s);
+          return `<div class="tface out inner" style="width:${f1(t.W)}px;height:${f1(t.H)}px;transform:${t.css}">${triSvg(t.W, t.H)}<span style="font-size:${fitFont(w, t.W * 0.56, t.W * 0.14)}px">${esc(w)}</span></div>`;
+        }
+        const [T, BL, BR] = FACE_TRI[d];
+        const t = triTransform(pv[T], pv[BL], pv[BR], NORMALS[d]);
+        if (!item) return `<div class="tface ghostface" style="width:${f1(t.W)}px;height:${f1(t.H)}px;transform:${t.css}">${triSvg(t.W, t.H)}</div>`;
+        const w = wordOn(item.card.words, item.orient, d);
+        const spin = d === BASE ? ';transform:translate(-50%,-50%) rotate(180deg)' : '';
+        return `<div class="tface out" style="width:${f1(t.W)}px;height:${f1(t.H)}px;transform:${t.css}">${triSvg(t.W, t.H)}<span style="font-size:${fitFont(w, t.W * 0.56, t.W * 0.14)}px${spin}">${esc(w)}</span></div>`;
+      }).join('');
+      const cls = ['tpiece', item ? pieceCls(item.card.id) : 'ghost', s === focus ? 'sel' : focus >= 0 ? 'faded' : '', markCls(marks, s), interactive ? 'clickable' : ''].join(' ');
+      return `<div class="${cls}" ${interactive ? `data-slot="${s}"` : ''} data-hover="${s}">${faces}</div>`;
+    }).join('');
+    // Each big face's hint fills the middle triangle of that face (the gap between its 3 corner pieces).
+    // That triangle points the other way, so the element is placed apex-first and its text turned 180°
+    // (the base's words are already turned 180°, so its hint isn't).
+    const hintFaces = FACE_ORDER.map((f) => {
+      const [T, BL, BR] = FACE_TRI[f].map((v) => scale(VERTS[v], R));
+      const mid = (p, q) => scale(add(p, q), 0.5);
+      const t = triTransform(mid(BL, BR), mid(T, BR), mid(T, BL), NORMALS[f]);
+      const spin = f === BASE ? '' : ';transform:translate(-50%,-50%) rotate(180deg)';
+      // The gap is left open (the inner sides show through it); the hint sits on a small shaded rectangle
+      // (the span's own background) at the centre of the gap.
+      return `<div class="tface hintface" style="width:${f1(t.W)}px;height:${f1(t.H)}px;transform:${t.css}"><span style="font-size:${fitFont(hints[f], t.W * 0.56, t.W * 0.13)}px${spin}">${esc(hints[f])}</span></div>`;
+    }).join('');
+    return `<div class="shape3d">${pieces}${hintFaces}</div>`;
+  };
+  const sceneH = Math.round(R * 2.0 + 40);
+  return `<div class="scene" data-r="${R}" style="height:${sceneH}px;perspective:${PERSPECTIVE}px;perspective-origin:50% 51%">
+      ${layer()}
+      <div class="hint">Drag to turn the tetrahedron</div>
+      ${controls}
+    </div>`;
+}
+
+// A loose piece, drawn as its unfolded net: a triangle split into 4 smaller triangles, one word each
+// (the centre one inverted). Folding the 3 corner triangles up would make the piece.
+// flip draws it upside down (words still upright), so pile pieces can interlock like a strip of triangles.
+const chipSize = (big = false) => (big ? 200 : window.innerWidth < 520 ? 140 : 160);
+// How far each pile piece slides under its neighbour: half a triangle, less a small gap between the edges.
+const chipOverlap = () => chipSize() / 2 - 9;
+function chipHTML(card, { movable = false, big = false, flip = false } = {}) {
+  const S = chipSize(big);
+  const H = (S * Math.sqrt(3)) / 2;
+  const pts = (...ps) => ps.map((p) => `${f1(p[0])},${f1(flip ? H - p[1] : p[1])}`).join(' ');
+  const ty = (y) => (flip ? H - y : y);
+  const T = [S / 2, 0], L = [0, H], R = [S, H], ml = [S / 4, H / 2], mr = [(3 * S) / 4, H / 2], mb = [S / 2, H];
+  const cells = [
+    { poly: pts(ml, mr, mb), c: [S / 2, (2 * H) / 3] }, // centre
+    { poly: pts(T, mr, ml), c: [S / 2, H / 3 + 3] }, // top
+    { poly: pts(ml, mb, L), c: [S / 4, (5 * H) / 6 + 2] }, // bottom-left
+    { poly: pts(mr, R, mb), c: [(3 * S) / 4, (5 * H) / 6 + 2] }, // bottom-right
+  ];
+  // All triangles first, then all words on top, so no word is covered by a neighbouring triangle.
+  const body = cells.map((c) => `<polygon points="${c.poly}"/>`).join('')
+    + card.words.map((w, i) => `<text x="${f1(cells[i].c[0])}" y="${f1(ty(cells[i].c[1]))}" font-size="${fitFont(w, S * (i === 0 ? 0.27 : 0.3), S * 0.085)}">${esc(w)}</text>`).join('');
+  const cls = ['chip', pieceCls(card.id), movable ? 'grab' : '', big ? 'big' : ''].join(' ');
+  const style = movable ? ` style="margin-left:${-chipOverlap()}px"` : '';
+  return `<div class="${cls}"${style} ${movable ? `draggable="true" data-card="${card.id}"` : ''} title="${esc(card.words.join(' · '))}">
+      <svg width="${S}" height="${f1(H)}" viewBox="-3 -3 ${S + 6} ${f1(H + 6)}"><polygon class="outline" points="${pts(T, R, L)}"/>${body}</svg>
+    </div>`;
+}
+
+// ---------------- screens ----------------
+
+function langPickerHTML() {
+  const n = settings.langs.length;
+  const items = LangBuilder.LANGS.map((l) => {
+    const on = settings.langs.includes(l.code);
+    const script = l.native
+      ? `<span class="seg" role="group" aria-label="${esc(l.name)} script">
+          <button class="segbtn${settings.native[l.code] ? '' : ' on'}" data-script="${l.code}" data-native="0" aria-pressed="${!settings.native[l.code]}">${esc(l.roman)}</button>
+          <button class="segbtn${settings.native[l.code] ? ' on' : ''}" data-script="${l.code}" data-native="1" aria-pressed="${!!settings.native[l.code]}" lang="${l.code}">${esc(l.native)}</button>
+        </span>`
+      : '';
+    return `<div class="lang${on ? ' on' : ''}">
+        <button class="langbtn" data-lang="${l.code}" aria-pressed="${on}"><span class="box" aria-hidden="true">${on ? '✓' : ''}</span>${esc(l.name)}</button>${script}
+      </div>`;
+  }).join('');
+  return `<div class="panel">
+      <h2>Languages <span class="muted" style="font-size:14px;font-weight:400">· ${n} picked, at least ${LangBuilder.MIN_LANGS}</span></h2>
+      <div class="langs">${items}</div>
+      <p class="muted" style="font-size:14px;margin:12px 0 0">Each face shows its English hint in 3 of these languages. For Japanese, Chinese and Korean, choose the
+        romanized spelling or the native script. Changing languages changes the words in every puzzle, so best times are kept separately for each choice.</p>
+    </div>`;
+}
+
+function renderList() {
+  topinfo.innerHTML = '';
+  const best = loadBest();
+  const solvedCount = PUZZLES.filter((p) => best[bestKey(p.id)]).length;
+  app.innerHTML = `
+    <div class="narrowmax">
+      ${langPickerHTML()}
+      <div class="panel">
+        <h1>Puzzles</h1>
+        <p class="muted">${solvedCount} of ${PUZZLES.length} solved with these languages. Best times are saved in this browser.</p>
+        <div class="plist">
+          ${PUZZLES.map((p, i) => {
+            const b = best[bestKey(p.id)];
+            return `<button class="pcard${b ? ' done' : ''}" data-open="${p.id}">
+                <span class="pnum">${i + 1}</span>
+                <span class="ptitle">${esc(p.title)}</span>
+                <span class="phints">${p.hints.map(esc).join(' · ')}</span>
+                <span class="pbest">${b ? `✓ Best ${fmtTime(b.time)}` : 'Not solved yet'}</span>
+              </button>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="panel rules">
+        <h2 style="color:var(--ink)">How to play</h2>
+        <ul>
+          <li>The big tetrahedron is built from 4 small pieces, one at each corner, with a hollow centre. Each piece has 4 words, one per side.</li>
+          <li>Each of the 4 big faces has a <b>hint</b>. When solved, the 3 words showing on that face all go with its hint.</li>
+          <li>At a corner, 3 of a piece's words face out and 1 faces the hollow centre, where it's hidden. Hidden words don't match any hint.</li>
+          <li>Put every piece at the right corner, turned the right way, then press <b>Check</b>.
+            A wrong check shows which pieces are wrong and adds <b>${PENALTY_SECONDS} seconds</b> to your time.</li>
+        </ul>
+      </div>
+    </div>`;
+}
+
+// Where the "hidden" highlight was last drawn, so it can slide from there to the new word.
+let hiddenMark = null; // { key: 'cardId@slot', idx }
+
+// The selected corner's piece: its 4 words in a row (in the piece's own fixed order) with a grey highlight
+// behind the one facing the hollow centre, and the turn buttons. Buttons that can't act are greyed out.
+function inspectorHTML(focus) {
+  const item = !game.solved && focus >= 0 ? game.placement[focus] : null;
+  const card = item ? game.cards[item.cardId] : null;
+  let row;
+  if (card) {
+    const idx = INV[item.orient][focus];
+    const key = `${card.id}@${focus}`;
+    const from = hiddenMark && hiddenMark.key === key ? hiddenMark.idx : idx;
+    hiddenMark = { key, idx };
+    row = `<div class="wordrow ${pieceCls(card.id)}"><span class="hl" style="--i:${from}" data-to="${idx}"><small>hidden</small></span>
+        ${card.words.map((w, i) => `<button class="w${i === idx ? ' hid' : ''}" data-hideword="${i}" ${i === idx ? 'aria-current="true"' : `title="Turn the piece so this word is hidden"`}>${esc(w)}</button>`).join('')}</div>`;
+  } else {
+    hiddenMark = null;
+    row = `<div class="wordrow empty"><span class="w">${game.solved ? 'Solved' : 'Choose words from the pile'}</span></div>`;
+  }
+  return `<div class="inspect">${row}</div>`;
+}
+
+// Buttons on the 3D view for the selected piece, in one row along its bottom: turn left, a trash can
+// (back to the pile), turn right. Greyed out when the selected corner is empty; gone once solved.
+const TRASH_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function sceneControlsHTML(focus) {
+  if (!game || game.solved) return '';
+  const item = focus >= 0 ? game.placement[focus] : null;
+  const off = item ? '' : 'disabled';
+  return `<button class="btn small scenebtn turnl" data-twist="1" data-slot-turn="${focus}" ${off}>Turn Left</button>
+    <button class="btn small scenebtn trash" data-topool="${item ? item.cardId : ''}" title="Back to the pile" aria-label="Back to the pile" ${off}>${TRASH_ICON}</button>
+    <button class="btn small scenebtn turnr" data-twist="-1" data-slot-turn="${focus}" ${off}>Turn Right</button>`;
+}
+
+// Shrink any word too wide for its column (the row has a fixed height, so words never wrap), then slide the
+// hidden-word highlight from where it was drawn to its new word.
+function slideHidden() {
+  app.querySelectorAll('#inspector .wordrow .w').forEach((el) => {
+    let fs = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > el.clientWidth + 1 && fs > 9) { fs -= 1; el.style.fontSize = `${fs}px`; }
+  });
+  const hl = app.querySelector('#inspector .hl');
+  if (!hl || hl.style.getPropertyValue('--i') === hl.dataset.to) return;
+  hl.getBoundingClientRect(); // commit the start position
+  hl.style.setProperty('--i', hl.dataset.to);
+}
+
+function renderPlay() {
+  const g = game;
+  const p = g.puzzle;
+  const idx = PUZZLES.findIndex((d) => d.id === p.id);
+  const focus = focusSlot();
+  g.focus = focus;
+  const interactive = !g.solved;
+  const slots = g.placement.map((x) => (x ? { card: g.cards[x.cardId], orient: x.orient } : null));
+  const placedIds = new Set(g.placement.filter(Boolean).map((x) => x.cardId));
+  const pool = g.order.filter((id) => !placedIds.has(id)).map((id) => g.cards[id]);
+  const full = g.placement.every(Boolean);
+  const next = PUZZLES[idx + 1];
+
+  topinfo.innerHTML = `Puzzle <b>${idx + 1}</b> · ${esc(p.title)}<span class="tlangs"> · ${settings.langs.map((c) => esc(langLabel(c))).join(', ')}</span>`;
+
+  let banner;
+  if (g.solved) {
+    banner = `<div class="banner ok solved">
+        <div><b>Solved!</b> Your time: <span class="bigtime">${fmtTime(g.finalMs)}</span></div>
+        <div class="muted-ok">${g.checks} check${g.checks === 1 ? '' : 's'} · ${g.penalty ? `includes +${g.penalty}s in penalties` : 'no penalties'} · ${g.newBest ? 'New best time!' : g.autoPlaced ? 'Pieces were auto-placed, so this time isn\'t saved' : g.best ? `Best: ${fmtTime(g.best.time)}` : ''}</div>
+      </div>`;
+  } else if (g.marks.some((m) => m === false)) {
+    const n = g.marks.filter((m) => m === false).length;
+    banner = `<div class="banner bad">${n} piece${n === 1 ? ' is' : 's are'} in the wrong place or turned the wrong way (marked red). Green pieces are right.</div>`;
+  } else {
+    banner = `<div class="banner">Put each piece at the right corner, turned the right way, so the 3 words on every face go with that face's hint.</div>`;
+  }
+
+  const main = `
+    ${banner}
+    ${g.solved ? '' : `<h3 class="pilehead">Pile <span class="muted" style="font-weight:400">(${pool.length})</span></h3>
+    <div class="pool" data-pool="1" style="margin-bottom:14px;padding-left:${12 + chipOverlap()}px">
+      ${pool.length ? pool.map((c, i) => chipHTML(c, { movable: true, flip: i % 2 === 1 })).join('') : '<span class="empty-note">All pieces are placed. Press Check when you think it\'s right.</span>'}
+    </div>`}
+    <div class="views">${tetraHTML({ slots, hints: g.built.hints, interactive, marks: g.marks, focus, controls: `<div id="scenectl">${sceneControlsHTML(focus)}</div>` })}</div>
+    <div id="inspector">${inspectorHTML(focus)}</div>`;
+
+  const side = `
+    <div class="panel timerpanel">
+      <div class="timerlabel">Time</div>
+      <div class="timer${g.solved ? ' done' : ''}" id="timer">${fmtTime(elapsedMs())}</div>
+      <div class="muted" style="font-size:13px">${g.penalty ? `includes +${g.penalty}s penalty` : `+${PENALTY_SECONDS}s for each wrong check`}${g.best && !g.solved ? ` · Best ${fmtTime(g.best.time)}` : ''}</div>
+      ${g.solved
+        ? `<div class="stack" style="margin-top:14px">
+            ${next ? `<button class="btn primary" data-open="${next.id}" style="width:100%">Next puzzle: ${esc(next.title)}</button>` : ''}
+            <button class="btn" data-open="${p.id}" style="width:100%">Play again</button>
+            <button class="btn" id="back" style="width:100%">All puzzles</button>
+          </div>`
+        : `<div class="stack" style="margin-top:14px">
+            <button class="btn primary" id="check" style="width:100%" ${full ? '' : 'disabled'}>${full ? 'Check' : `Place all 4 pieces (${g.placement.filter(Boolean).length}/4)`}</button>
+            <div class="row"><button class="btn small" id="reset">Clear board</button><button class="btn small" id="back">All puzzles</button></div>
+          </div>`}
+    </div>`;
+
+  app.innerHTML = `<div class="layout"><div class="panel">${main}</div><div>${side}</div></div>`;
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+  on('check', check);
+  on('reset', resetBoard);
+  on('back', closePuzzle);
+}
+
+function render() {
+  if (game) renderPlay();
+  else renderList();
+  applyCamera();
+  runPieceAnimation();
+  if (pendingCelebrate) { pendingCelebrate = false; celebrate(); }
+  slideHidden();
+}
+
+// ---------------- piece rotation animation ----------------
+
+const ROTATE_MS = 450;
+let pendingAnim = null; // {slot, M}: world rotation the piece at `slot` just went through
+
+// 3x3 inverse (adjugate / determinant).
+function inv3(m) {
+  const [[a, b, c], [d, e, f], [g, h, i]] = m;
+  const A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
+  const det = a * A + b * B + c * C;
+  return [
+    [A / det, -(b * i - c * h) / det, (b * f - c * e) / det],
+    [B / det, (a * i - c * g) / det, -(a * f - c * d) / det],
+    [C / det, -(a * h - b * g) / det, (a * e - b * d) / det],
+  ];
+}
+const mul3 = (X, Y) => X.map((row) => [0, 1, 2].map((j) => row[0] * Y[0][j] + row[1] * Y[1][j] + row[2] * Y[2][j]));
+const cols = (vs) => [0, 1, 2].map((r) => vs.map((v) => v[r])); // vectors as matrix columns
+
+// The rotation that took a piece from orientation `from` to `to`: world vertex w moves to G[w].
+function rotationBetween(from, to) {
+  const G = [0, 1, 2, 3].map((w) => PERM[to][INV[from][w]]);
+  const A = cols([1, 2, 3].map((w) => VERTS[w]));
+  const B = cols([1, 2, 3].map((w) => VERTS[G[w]]));
+  return mul3(B, inv3(A));
+}
+
+// The orientation that puts the piece's word i into the hidden centre at `slot` with the smallest turn from
+// orientation o. Three orientations hide that word; the turn angle comes from the rotation's trace.
+function hideWordOrient(o, slot, i) {
+  let best = o;
+  let bestAngle = Infinity;
+  PERM.forEach((P, n) => {
+    if (P[i] !== slot) return;
+    const M = rotationBetween(o, n);
+    const angle = Math.acos(clamp((M[0][0] + M[1][1] + M[2][2] - 1) / 2, -1, 1));
+    if (angle < bestAngle - 1e-9) { bestAngle = angle; best = n; }
+  });
+  return best;
+}
+
+// Turn a placed piece to a new orientation, animating the 3D piece through the rotation.
+function rotatePiece(slot, orient) {
+  const cur = game.placement[slot];
+  if (!cur || cur.orient === orient) return;
+  pendingAnim = { slot, M: rotationBetween(cur.orient, orient) };
+  setOrient(slot, orient);
+}
+
+// The new orientation is already drawn: start the piece rotated back to where it was, then let it turn
+// (about its own centre) into place.
+function runPieceAnimation() {
+  const anim = pendingAnim;
+  pendingAnim = null;
+  if (!anim) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const els = app.querySelectorAll(`.scene .tpiece[data-hover="${anim.slot}"]`);
+  if (!els.length) return;
+  const R = Number(els[0].closest('.scene').dataset.r);
+  const c = toCss(scale(VERTS[anim.slot], R / 2)).map(f1);
+  const about = (M) => `translate3d(${c[0]}px,${c[1]}px,${c[2]}px) ${cssMatrix(M)} translate3d(${-c[0]}px,${-c[1]}px,${-c[2]}px)`;
+  const back = anim.M.map((row, i) => row.map((_, j) => anim.M[j][i])); // inverse of a rotation = transpose
+  els.forEach((el) => {
+    el.style.transition = 'none';
+    el.style.transform = about(back);
+    el.getBoundingClientRect(); // commit the start pose before transitioning
+    el.style.transition = `transform ${ROTATE_MS}ms cubic-bezier(.3,.7,.3,1)`;
+    el.style.transform = about([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+  });
+}
+
+// ---------------- solved animation ----------------
+
+let pendingCelebrate = false;
+let celebrateFrame = 0;
+
+// Rotation by `angle` (radians) about the unit vector `a` (Rodrigues' formula), world coordinates.
+function axisRotation(a, angle) {
+  const [x, y, z] = a;
+  const c = Math.cos(angle), s = Math.sin(angle), k = 1 - c;
+  return [
+    [c + x * x * k, x * y * k - z * s, x * z * k + y * s],
+    [y * x * k + z * s, c + y * y * k, y * z * k - x * s],
+    [z * x * k - y * s, z * y * k + x * s, c + z * z * k],
+  ];
+}
+
+// On a correct answer every piece spins in place about a vertical axis through its own centre, starting fast and
+// slowing exponentially (angle left = A·e^(-t/τ)), so each stops exactly in its solved orientation.
+const SPIN_TAU = 0.4 / 0.75; // seconds for the remaining spin to fall to 1/e (0.4s stretched: 25% slower)
+const SPIN_STOP = 0.002; // radians: below this the piece is treated as stopped
+function celebrate() {
+  cancelAnimationFrame(celebrateFrame);
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const els = [...app.querySelectorAll('.scene .tpiece')];
+  if (!els.length) return;
+  const R = Number(els[0].closest('.scene').dataset.r);
+  const spins = els.map((el) => {
+    const s = Number(el.dataset.hover);
+    const c = toCss(scale(VERTS[s], R / 2)).map(f1);
+    // 3 to 4.5 turns, alternating direction, so neighbours don't spin in lockstep.
+    const A = (s % 2 ? 1 : -1) * 2 * Math.PI * (3 + s * 0.5);
+    return { el, axis: [0, 1, 0], A, c };
+  });
+  const start = performance.now();
+  const frame = (now) => {
+    const t = (now - start) / 1000;
+    let running = false;
+    for (const p of spins) {
+      if (!p.el.isConnected) continue;
+      const a = p.A * Math.exp(-t / SPIN_TAU);
+      p.el.style.transition = 'none';
+      if (Math.abs(a) < SPIN_STOP) { p.el.style.transform = ''; continue; }
+      running = true;
+      p.el.style.transform = `translate3d(${p.c[0]}px,${p.c[1]}px,${p.c[2]}px) ${cssMatrix(axisRotation(p.axis, a))} translate3d(${-p.c[0]}px,${-p.c[1]}px,${-p.c[2]}px)`;
+    }
+    if (running) celebrateFrame = requestAnimationFrame(frame);
+  };
+  celebrateFrame = requestAnimationFrame(frame);
+}
+
+// Live timer: update just the clock text.
+setInterval(() => {
+  if (!game || game.solved) return;
+  const el = document.getElementById('timer');
+  if (el) el.textContent = fmtTime(elapsedMs());
+}, 100);
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(render, 150);
+});
+
+// ---------------- 3D orbit ----------------
+
+let drag = null;
+let suppressClick = false;
+app.addEventListener('pointerdown', (e) => {
+  const scene = e.target.closest('.scene');
+  if (!scene || e.button > 0 || e.target.closest('button')) return;
+  drag = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch, moved: false, scene, id: e.pointerId };
+});
+window.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x;
+  const dy = e.clientY - drag.y;
+  if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+  if (!drag.moved) {
+    drag.moved = true;
+    try { drag.scene.setPointerCapture(e.pointerId); } catch {}
+  }
+  cam.yaw = drag.yaw + dx * 0.5;
+  cam.pitch = clamp(drag.pitch + dy * 0.5, -85, 85);
+  applyCamera();
+});
+window.addEventListener('pointerup', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (drag.moved) {
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 0);
+  }
+  drag = null;
+});
+window.addEventListener('pointercancel', () => { drag = null; });
+
+// Hovering a piece highlights it.
+app.addEventListener('mouseover', (e) => {
+  const t = e.target.closest('[data-hover]');
+  const s = t ? t.dataset.hover : null;
+  app.querySelectorAll('.hover').forEach((el) => el.classList.remove('hover'));
+  if (s === null) return;
+  app.querySelectorAll(`[data-hover="${s}"]`).forEach((el) => el.classList.add('hover'));
+});
+
+// ---------------- interaction (event delegation) ----------------
+
+app.addEventListener('click', (e) => {
+  if (suppressClick) return;
+  const langBtn = e.target.closest('[data-lang]');
+  if (langBtn) { toggleLang(langBtn.dataset.lang); return; }
+  const scriptBtn = e.target.closest('[data-script]');
+  if (scriptBtn) { setScript(scriptBtn.dataset.script, scriptBtn.dataset.native === '1'); return; }
+  const open = e.target.closest('[data-open]');
+  if (open) {
+    const p = PUZZLES.find((x) => x.id === open.dataset.open);
+    if (p) openPuzzle(p);
+    return;
+  }
+  if (!game || game.solved) return;
+  if (e.detail === 3 && e.target.closest('#timer')) { placeAllCorrectly(); return; }
+  const twistBtn = e.target.closest('[data-twist]');
+  if (twistBtn) {
+    const slot = Number(twistBtn.dataset.slotTurn);
+    rotatePiece(slot, twist(game.placement[slot].orient, slot, Number(twistBtn.dataset.twist)));
+    return;
+  }
+  const hideBtn = e.target.closest('[data-hideword]');
+  if (hideBtn) {
+    const slot = game.focus;
+    if (slot >= 0 && game.placement[slot]) rotatePiece(slot, hideWordOrient(game.placement[slot].orient, slot, Number(hideBtn.dataset.hideword)));
+    return;
+  }
+  const toPool = e.target.closest('[data-topool]');
+  if (toPool) {
+      move(toPool.dataset.topool, 'pool');
+    return;
+  }
+  const chip = e.target.closest('[data-card]');
+  if (chip && locate(chip.dataset.card) < 0 && game.focus >= 0) {
+    // Put the pile piece into the selected corner (a piece already there goes back to the pile).
+    move(chip.dataset.card, game.focus);
+  }
+});
+
+app.addEventListener('dragstart', (e) => {
+  const chip = e.target.closest('[data-card]');
+  if (!chip) return;
+  e.dataTransfer.setData('text/plain', chip.dataset.card);
+  e.dataTransfer.effectAllowed = 'move';
+});
+app.addEventListener('dragover', (e) => {
+  const t = e.target.closest('[data-slot],[data-pool]');
+  if (!t) return;
+  e.preventDefault();
+  app.querySelectorAll('.dragover').forEach((x) => x !== t && x.classList.remove('dragover'));
+  t.classList.add('dragover');
+});
+app.addEventListener('dragleave', (e) => {
+  const t = e.target.closest('[data-slot],[data-pool]');
+  if (t && !t.contains(e.relatedTarget)) t.classList.remove('dragover');
+});
+app.addEventListener('drop', (e) => {
+  const t = e.target.closest('[data-slot],[data-pool]');
+  if (!t || !game) return;
+  e.preventDefault();
+  t.classList.remove('dragover');
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id || !game.cards[id]) return;
+  const toPool = t.dataset.slot === undefined;
+  move(id, toPool ? 'pool' : Number(t.dataset.slot));
+});
+
+// The logo goes back to the puzzle list (without reloading the page).
+document.getElementById('home').addEventListener('click', (e) => {
+  e.preventDefault();
+  if (game) closePuzzle();
+  else window.scrollTo(0, 0);
+});
+
+// ---------------- boot ----------------
+
+const initial = PUZZLES.find((p) => `#${p.id}` === location.hash);
+if (initial) openPuzzle(initial);
+else render();
+</script>
+</body>
+</html>
