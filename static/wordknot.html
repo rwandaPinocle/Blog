@@ -1066,6 +1066,7 @@ table.records tr.me td {
   font-weight: 600;
   background: var(--zone);
   color: var(--zone-ink);
+  text-align: center;
 }
 
 .banner.bad {
@@ -2168,7 +2169,7 @@ function tetraHTML({ slots, hints, interactive = false, marks = null, focus = -1
 // A loose piece, drawn as its unfolded net: a triangle split into 4 smaller triangles, one word each
 // (the centre one inverted). Folding the 3 corner triangles up would make the piece.
 // flip draws it upside down (words still upright), so pile pieces can interlock like a strip of triangles.
-const chipSize = (big = false) => (big ? 200 : window.innerWidth < 520 ? 120 : 160);
+const chipSize = (big = false) => (big ? 200 : window.innerWidth < 540 ? 120 : 160);
 // How far each pile piece slides under its neighbour: half a triangle, less a small gap between the edges.
 const chipOverlap = () => chipSize() / 2 - 9;
 // ghost: an invisible stand-in, laid out like a pile piece (used to keep the pile's height constant).
@@ -2322,23 +2323,21 @@ function renderPlay() {
   let banner;
   if (g.solved) {
     banner = `<div class="banner ok solved">
-        <div><b>Solved!</b> Your time: <span class="bigtime">${fmtTime(g.finalMs)}</span></div>
-        <div class="muted-ok">${g.checks} check${g.checks === 1 ? '' : 's'} · ${g.penalty ? `includes +${g.penalty}s in penalties` : 'no penalties'} · ${g.newBest ? 'New best time!' : g.autoPlaced ? 'Pieces were auto-placed, so this time isn\'t saved' : g.best ? `Best: ${fmtTime(g.best.time)}` : ''}</div>
+        <div><b>Solved!</b> Your time: ${fmtTime(g.finalMs)} ${g.newBest ? 'New best time!' : g.best ? `Best: ${fmtTime(g.best.time)}` : ''}</div>
       </div>`;
   } else if (g.marks.some((m) => m === false)) {
     const n = g.marks.filter((m) => m === false).length;
-    banner = `<div class="banner bad">${n} piece${n === 1 ? ' is' : 's are'} in the wrong place or turned the wrong way (marked red). Green pieces are right.</div>`;
+    banner = `<div class="banner bad">${n} piece${n === 1 ? ' is' : 's are'} wrong</div>`;
   } else {
-    banner = `<div class="banner">Put each piece at the right corner, turned the right way, so the 3 words on every face go with that face's hint.</div>`;
+    banner = `<div class="banner">Match the words to their translation</div>`;
   }
 
   const main = `
     ${banner}
-    ${g.solved ? '' : `<h3 class="pilehead">Pile <span class="muted" style="font-weight:400">(${pool.length})</span></h3>
     <div class="pool" data-pool="1" style="margin-bottom:14px;padding-left:${12 + chipOverlap()}px">
       <div class="poolsizer" aria-hidden="true">${g.order.map((id) => chipHTML(g.cards[id], { ghost: true })).join('')}</div>
       <div class="poolitems">${pool.length ? pool.map((c, i) => chipHTML(c, { movable: true, flip: i % 2 === 1 })).join('') : '<span class="empty-note">All pieces are placed. Press Check when you think it\'s right.</span>'}</div>
-    </div>`}
+    </div>
     <div class="views">${tetraHTML({ slots, hints: g.built.hints, interactive, marks: g.marks, focus, controls: `<div id="scenectl">${sceneControlsHTML(focus)}</div>` })}</div>
     <div id="inspector">${inspectorHTML(focus)}</div>`;
 
