@@ -533,7 +533,7 @@ table.records tr.me td {
   user-select: none;
   overflow: hidden;
   border-radius: 14px;
-  background: radial-gradient(circle at 50% 51%, var(--zone) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 56%, var(--zone) 0%, transparent 70%);
 }
 
 .scene:active {
@@ -543,7 +543,7 @@ table.records tr.me td {
 .shape3d {
   position: absolute;
   left: 50%;
-  top: 51%;
+  top: 56%;
   width: 0;
   height: 0;
   transform-style: preserve-3d;
@@ -703,16 +703,28 @@ table.records tr.me td {
   margin-right: auto;
 }
 
+/* The pile keeps the height it has with every piece in it, so the page below never moves: an invisible copy
+   of the full pile (.poolsizer) sets the height, and the pieces still in the pile (.poolitems) sit on top of it. */
 .pool {
   box-sizing: border-box;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 0;
-  justify-content: center;
+  display: grid;
   min-height: 90px;
   padding: 12px;
   border-radius: 14px;
   border: 2px dashed var(--line);
+}
+
+.poolsizer, .poolitems {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 0;
+  justify-content: center;
+  align-content: center;
+}
+
+.poolsizer {
+  visibility: hidden;
 }
 
 .pool.target {
@@ -1024,6 +1036,7 @@ table.records tr.me td {
 }
 #scenectl:empty { display: none; }
 .scenebtn { cursor: pointer; font-size: 13px; min-height: 36px; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+.scenebtn.turnl, .scenebtn.turnr { display: grid; place-items: center; padding-top: 0; padding-bottom: 0; }
 .scenebtn.trash { display: grid; place-items: center; width: 48px; padding: 0; color: var(--bad); }
 .scenebtn.trash:hover:not(:disabled) { background: color-mix(in srgb, var(--bad) 12%, var(--card-bg)); }
 
@@ -1987,8 +2000,10 @@ function check() {
 function sizes() {
   const w = window.innerWidth;
   const narrow = w < 760;
+  const base = narrow ? clamp(Math.floor(((w - 48) / 2 - 50) / 1.12), 70, 170) : 170;
   return {
-    R: narrow ? clamp(Math.floor(((w - 48) / 2 - 50) / 1.12), 70, 170) : 170, // big tetrahedron circumradius (px)
+    R: Math.round(base * 1.21), // big tetrahedron circumradius (px)
+    sceneH: Math.round((base * 2.0 + 40) * 1.2), // height of the 3D view (px)
   };
 }
 
@@ -2142,8 +2157,8 @@ function tetraHTML({ slots, hints, interactive = false, marks = null, focus = -1
     }).join('');
     return `<div class="shape3d">${pieces}${hintFaces}</div>`;
   };
-  const sceneH = Math.round(R * 2.0 + 40);
-  return `<div class="scene" data-r="${R}" style="height:${sceneH}px;perspective:${PERSPECTIVE}px;perspective-origin:50% 51%">
+  const { sceneH } = sizes();
+  return `<div class="scene" data-r="${R}" style="height:${sceneH}px;perspective:${PERSPECTIVE}px;perspective-origin:50% 56%">
       ${layer()}
       <div class="hint">Drag to turn the tetrahedron</div>
       ${controls}
@@ -2153,10 +2168,11 @@ function tetraHTML({ slots, hints, interactive = false, marks = null, focus = -1
 // A loose piece, drawn as its unfolded net: a triangle split into 4 smaller triangles, one word each
 // (the centre one inverted). Folding the 3 corner triangles up would make the piece.
 // flip draws it upside down (words still upright), so pile pieces can interlock like a strip of triangles.
-const chipSize = (big = false) => (big ? 200 : window.innerWidth < 520 ? 140 : 160);
+const chipSize = (big = false) => (big ? 200 : window.innerWidth < 520 ? 120 : 160);
 // How far each pile piece slides under its neighbour: half a triangle, less a small gap between the edges.
 const chipOverlap = () => chipSize() / 2 - 9;
-function chipHTML(card, { movable = false, big = false, flip = false } = {}) {
+// ghost: an invisible stand-in, laid out like a pile piece (used to keep the pile's height constant).
+function chipHTML(card, { movable = false, big = false, flip = false, ghost = false } = {}) {
   const S = chipSize(big);
   const H = (S * Math.sqrt(3)) / 2;
   const pts = (...ps) => ps.map((p) => `${f1(p[0])},${f1(flip ? H - p[1] : p[1])}`).join(' ');
@@ -2172,7 +2188,8 @@ function chipHTML(card, { movable = false, big = false, flip = false } = {}) {
   const body = cells.map((c) => `<polygon points="${c.poly}"/>`).join('')
     + card.words.map((w, i) => `<text x="${f1(cells[i].c[0])}" y="${f1(ty(cells[i].c[1]))}" font-size="${fitFont(w, S * (i === 0 ? 0.27 : 0.3), S * 0.085)}">${esc(w)}</text>`).join('');
   const cls = ['chip', pieceCls(card.id), movable ? 'grab' : '', big ? 'big' : ''].join(' ');
-  const style = movable ? ` style="margin-left:${-chipOverlap()}px"` : '';
+  const style = movable || ghost ? ` style="margin-left:${-chipOverlap()}px"` : '';
+  if (ghost) return `<div class="${cls}"${style}><svg width="${S}" height="${f1(H)}"></svg></div>`;
   return `<div class="${cls}"${style} ${movable ? `draggable="true" data-card="${card.id}"` : ''} title="${esc(card.words.join(' · '))}">
       <svg width="${S}" height="${f1(H)}" viewBox="-3 -3 ${S + 6} ${f1(H + 6)}"><polygon class="outline" points="${pts(T, R, L)}"/>${body}</svg>
     </div>`;
@@ -2262,14 +2279,16 @@ function inspectorHTML(focus) {
 
 // Buttons on the 3D view for the selected piece, in one row along its bottom: turn left, a trash can
 // (back to the pile), turn right. Greyed out when the selected corner is empty; gone once solved.
+// A triangle (the piece) with a curved arrow over it: clockwise for Turn Right; mirrored, anticlockwise, for Turn Left.
+const turnIcon = (cw) => `<svg viewBox="0 0 32 28" width="36" height="31" aria-hidden="true"><g${cw ? '' : ' transform="translate(32 0) scale(-1 1)"'} fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13 L23.5 25 H8.5 Z"/><path d="M6 13 A11 9 0 0 1 26 12"/><path d="M21.5 10.5 L26.2 12.4 L27.6 7.5" transform="rotate(-10 26.2 12.4)"/></g></svg>`;
 const TRASH_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function sceneControlsHTML(focus) {
   if (!game || game.solved) return '';
   const item = focus >= 0 ? game.placement[focus] : null;
   const off = item ? '' : 'disabled';
-  return `<button class="btn small scenebtn turnl" data-twist="1" data-slot-turn="${focus}" ${off}>Turn Left</button>
+  return `<button class="btn small scenebtn turnl" data-twist="1" data-slot-turn="${focus}" title="Turn Left" aria-label="Turn Left" ${off}>${turnIcon(false)}</button>
     <button class="btn small scenebtn trash" data-topool="${item ? item.cardId : ''}" title="Back to the pile" aria-label="Back to the pile" ${off}>${TRASH_ICON}</button>
-    <button class="btn small scenebtn turnr" data-twist="-1" data-slot-turn="${focus}" ${off}>Turn Right</button>`;
+    <button class="btn small scenebtn turnr" data-twist="-1" data-slot-turn="${focus}" title="Turn Right" aria-label="Turn Right" ${off}>${turnIcon(true)}</button>`;
 }
 
 // Shrink any word too wide for its column (the row has a fixed height, so words never wrap), then slide the
@@ -2317,7 +2336,8 @@ function renderPlay() {
     ${banner}
     ${g.solved ? '' : `<h3 class="pilehead">Pile <span class="muted" style="font-weight:400">(${pool.length})</span></h3>
     <div class="pool" data-pool="1" style="margin-bottom:14px;padding-left:${12 + chipOverlap()}px">
-      ${pool.length ? pool.map((c, i) => chipHTML(c, { movable: true, flip: i % 2 === 1 })).join('') : '<span class="empty-note">All pieces are placed. Press Check when you think it\'s right.</span>'}
+      <div class="poolsizer" aria-hidden="true">${g.order.map((id) => chipHTML(g.cards[id], { ghost: true })).join('')}</div>
+      <div class="poolitems">${pool.length ? pool.map((c, i) => chipHTML(c, { movable: true, flip: i % 2 === 1 })).join('') : '<span class="empty-note">All pieces are placed. Press Check when you think it\'s right.</span>'}</div>
     </div>`}
     <div class="views">${tetraHTML({ slots, hints: g.built.hints, interactive, marks: g.marks, focus, controls: `<div id="scenectl">${sceneControlsHTML(focus)}</div>` })}</div>
     <div id="inspector">${inspectorHTML(focus)}</div>`;
