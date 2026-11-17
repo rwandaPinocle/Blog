@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wordknot</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='3' width='12' height='12' rx='3' fill='%23e4572e'/><rect x='17' y='3' width='12' height='12' rx='3' fill='%232e3a87'/><rect x='3' y='17' width='12' height='12' rx='3' fill='%232e3a87'/><rect x='17' y='17' width='12' height='12' rx='3' fill='%23e4572e'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
   <style>
 :root {
   --bg: #f4efe6;
@@ -533,7 +536,7 @@ table.records tr.me td {
   user-select: none;
   overflow: hidden;
   border-radius: 14px;
-  background: radial-gradient(circle at 50% 56%, var(--zone) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 48%, var(--zone) 0%, transparent 70%);
 }
 
 .scene:active {
@@ -543,7 +546,7 @@ table.records tr.me td {
 .shape3d {
   position: absolute;
   left: 50%;
-  top: 56%;
+  top: 48%;
   width: 0;
   height: 0;
   transform-style: preserve-3d;
@@ -990,38 +993,6 @@ table.records tr.me td {
   }
 }
 
-/* ---------- timer ---------- */
-.timerlabel {
-  font-size: 13px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  font-weight: 700;
-}
-
-.timer {
-  font-size: 40px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  user-select: none;
-}
-
-.timer.done {
-  color: var(--ok);
-}
-
-.banner.solved {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.bigtime {
-  font-size: 22px;
-  font-variant-numeric: tabular-nums;
-}
-
 .muted-ok {
   font-weight: 500;
   font-size: 14px;
@@ -1154,7 +1125,310 @@ table.records tr.me td {
     gap: 8px;
     padding: 8px;
   }
-}</style>
+}
+
+/* ================= Puzzle page, from the Figma design ("Wordknot", Puzzle Page) =================
+   One centred 600px column: the pile, the 3D view (600 x 520) with its buttons, the word row and Check Solution. */
+:root {
+  --page: #fffffa;
+  --frame: #353531;
+  --rule: #000;
+  --view-bg: rgba(217, 217, 217, .17);
+  --check-line: #7d7d7d;
+  --hl: #d9d9d9;
+  --word-ink: #000;
+  /* piece colours */
+  --pc-yellow: #ffb400;
+  --pc-orange: #fe8c00;
+  --pc-green: #00aa77;
+  --pc-blue: #0073a4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #15171f;
+    --frame: #c9c7bd;
+    --rule: #ecebe6;
+    --view-bg: rgba(217, 217, 217, .06);
+    --check-line: #8a8a8a;
+    --hl: #4a4d58;
+    --word-ink: #ecebe6;
+  }
+}
+
+:root[data-theme="dark"] {
+  --page: #15171f;
+  --frame: #c9c7bd;
+  --rule: #ecebe6;
+  --view-bg: rgba(217, 217, 217, .06);
+  --check-line: #8a8a8a;
+  --hl: #4a4d58;
+  --word-ink: #ecebe6;
+}
+
+body {
+  background: var(--page);
+  font-family: Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.topbar {
+  height: 50px;
+  padding: 0 16px;
+  background: var(--page);
+  border-bottom: 4px solid var(--rule);
+}
+
+.p0 { --pc: var(--pc-yellow); }
+.p1 { --pc: var(--pc-orange); }
+.p2 { --pc: var(--pc-green); }
+.p3 { --pc: var(--pc-blue); }
+
+main:has(.play) {
+  padding-top: 36px;
+}
+
+.play {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Pile: a dashed box with the loose pieces in one row */
+.play .pool {
+  max-width: none;
+  margin: 0 0 12px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  padding-right: 12px;
+  border: 1px dashed var(--frame);
+  border-radius: 10px;
+  background: var(--page);
+  min-height: 0;
+}
+
+.play .poolsizer,
+.play .poolitems {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.play .chip {
+  filter: none;
+}
+
+.play .chip polygon {
+  fill: color-mix(in srgb, var(--pc) 50%, var(--page));
+  stroke: color-mix(in srgb, var(--pc) 35%, var(--page));
+  stroke-width: 1;
+}
+
+.play .chip polygon.outline {
+  fill: none;
+  stroke: var(--pc);
+  stroke-width: 2;
+}
+
+.play .chip text {
+  fill: var(--word-ink);
+  font-weight: 500;
+}
+
+.play .pool .empty-note {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+/* 3D view: a light grey 600 x 520 panel */
+.play .scene {
+  max-width: none;
+  flex: none;
+  aspect-ratio: 600 / 520;
+  border-radius: 0;
+  background: var(--view-bg);
+}
+
+.play .tface.out polygon {
+  fill: color-mix(in srgb, var(--pc) 50%, var(--page));
+  stroke: var(--pc);
+  stroke-width: 9;
+}
+
+.play .tpiece.sel .tface.out polygon {
+  fill: color-mix(in srgb, var(--pc) 50%, var(--page));
+  stroke: var(--pc);
+  stroke-width: 9;
+}
+
+.play .tpiece.faded .tface.out polygon {
+  fill: color-mix(in srgb, var(--pc) 22%, var(--page));
+  stroke: color-mix(in srgb, var(--pc) 50%, var(--page));
+}
+
+.play .tface span {
+  font-weight: 400;
+  color: var(--word-ink);
+}
+
+.play .tpiece.faded .tface span {
+  color: color-mix(in srgb, var(--word-ink) 55%, var(--page));
+}
+
+.play .tpiece.ok .tface.out polygon {
+  stroke: var(--ok);
+}
+
+.play .tpiece.bad .tface.out polygon {
+  stroke: var(--bad);
+}
+
+/* Buttons on the view: two white squares (turn left / right) with the red trash can between them */
+.play #scenectl {
+  left: 50%;
+  width: auto;
+  bottom: 5%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.play .scenebtn {
+  display: grid;
+  place-items: center;
+  width: 53px;
+  height: 52px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--frame);
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+}
+
+.play .scenebtn.trash {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  background: none;
+}
+
+.play .scenebtn.trash img {
+  display: block;
+  width: 46px;
+  height: 46px;
+}
+
+.play .scenebtn.trash:hover:not(:disabled) {
+  background: none;
+  transform: scale(1.06);
+}
+
+.play .scenebtn:not(.trash):hover:not(:disabled) {
+  background: #f1f1ec;
+}
+
+.play .scenebtn:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+/* Word row: a pill in the selected piece's colour, with a grey pill behind the hidden word */
+.play .inspect {
+  max-width: none;
+  margin: 29px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.play .wordrow {
+  height: 59px;
+  border-radius: 59px;
+  overflow: hidden;
+}
+
+.play .wordrow:not(.empty) {
+  background: color-mix(in srgb, var(--pc) 75%, transparent);
+  border-radius: 59px;
+}
+
+.play .wordrow .w {
+  padding: 0 8px;
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--word-ink);
+  border-radius: 59px;
+}
+
+.play .wordrow .w:hover:not(.hid) {
+  color: var(--word-ink);
+  background: rgba(255, 255, 255, .22);
+}
+
+.play .wordrow .hl {
+  border-radius: 59px;
+  background: var(--hl);
+}
+
+.play .wordrow.empty {
+  background: var(--view-bg);
+  border: 1px dashed var(--check-line);
+}
+
+.play .wordrow.empty .w {
+  font-size: 20px;
+}
+
+/* Check Solution (Next Puzzle once solved) */
+.checkbtn {
+  align-self: center;
+  width: 250px;
+  height: 45px;
+  margin-top: 29px;
+  padding: 0;
+  border: 1px solid var(--check-line);
+  border-radius: 0;
+  background: var(--page);
+  color: var(--word-ink);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.checkbtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--check-line) 12%, var(--page));
+}
+
+.checkbtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  main:has(.play) {
+    padding-top: 20px;
+  }
+
+  .play .wordrow {
+    height: 48px;
+  }
+
+  .play .wordrow .w {
+    font-size: 20px;
+  }
+
+  .play .scenebtn {
+    width: 46px;
+    height: 45px;
+  }
+
+  .checkbtn {
+    font-size: 20px;
+  }
+}
+</style>
 </head>
 <body>
   <header class="topbar">
@@ -1275,7 +1549,7 @@ table.records tr.me td {
 </script>
   <script>
 // English words with their translations, grouped by theme. The puzzles are built from this in the browser.
-// Columns: English, Spanish, Italian, Portuguese (Brazil), French, German (nouns capitalized), then [romanized, native] for
+// Columns: English, Spanish, Italian, Portuguese (Brazil), French, German (nouns capitalized), Asante Twi, then [romanized, native] for
 // Japanese (Hepburn / kana and kanji), Chinese (pinyin with tone marks / simplified characters) and
 // Korean (Revised Romanization / Hangul).
 (function (root, factory) {
@@ -1290,167 +1564,168 @@ table.records tr.me td {
       { code: 'pt', name: 'Portuguese' },
       { code: 'fr', name: 'French' },
       { code: 'de', name: 'German' },
+      { code: 'tw', name: 'Asante Twi' },
       { code: 'ja', name: 'Japanese', roman: 'Rōmaji', native: '日本語' },
       { code: 'zh', name: 'Chinese', roman: 'Pinyin', native: '中文' },
       { code: 'ko', name: 'Korean', roman: 'Romanized', native: '한국어' },
     ],
     categories: {
       'Animals': [
-        ['Cat', 'gato', 'gatto', 'gato', 'chat', 'Katze', ['neko', '猫'], ['māo', '猫'], ['goyangi', '고양이']],
-        ['Dog', 'perro', 'cane', 'cão', 'chien', 'Hund', ['inu', '犬'], ['gǒu', '狗'], ['gae', '개']],
-        ['Horse', 'caballo', 'cavallo', 'cavalo', 'cheval', 'Pferd', ['uma', '馬'], ['mǎ', '马'], ['mal', '말']],
-        ['Cow', 'vaca', 'mucca', 'vaca', 'vache', 'Kuh', ['ushi', '牛'], ['niú', '牛'], ['so', '소']],
-        ['Pig', 'cerdo', 'maiale', 'porco', 'cochon', 'Schwein', ['buta', '豚'], ['zhū', '猪'], ['dwaeji', '돼지']],
-        ['Bird', 'pájaro', 'uccello', 'pássaro', 'oiseau', 'Vogel', ['tori', '鳥'], ['niǎo', '鸟'], ['sae', '새']],
-        ['Fish', 'pez', 'pesce', 'peixe', 'poisson', 'Fisch', ['sakana', '魚'], ['yú', '鱼'], ['mulgogi', '물고기']],
-        ['Rabbit', 'conejo', 'coniglio', 'coelho', 'lapin', 'Hase', ['usagi', 'うさぎ'], ['tùzi', '兔子'], ['tokki', '토끼']],
-        ['Lion', 'león', 'leone', 'leão', 'lion', 'Löwe', ['raion', 'ライオン'], ['shīzi', '狮子'], ['saja', '사자']],
-        ['Bear', 'oso', 'orso', 'urso', 'ours', 'Bär', ['kuma', '熊'], ['xióng', '熊'], ['gom', '곰']],
-        ['Mouse', 'ratón', 'topo', 'rato', 'souris', 'Maus', ['nezumi', 'ねずみ'], ['lǎoshǔ', '老鼠'], ['jwi', '쥐']],
-        ['Monkey', 'mono', 'scimmia', 'macaco', 'singe', 'Affe', ['saru', '猿'], ['hóuzi', '猴子'], ['wonsungi', '원숭이']],
-        ['Elephant', 'elefante', 'elefante', 'elefante', 'éléphant', 'Elefant', ['zō', '象'], ['dàxiàng', '大象'], ['kokkiri', '코끼리']],
-        ['Snake', 'serpiente', 'serpente', 'cobra', 'serpent', 'Schlange', ['hebi', '蛇'], ['shé', '蛇'], ['baem', '뱀']],
+        ['Cat', 'gato', 'gatto', 'gato', 'chat', 'Katze', 'agyinamoa', ['neko', '猫'], ['māo', '猫'], ['goyangi', '고양이']],
+        ['Dog', 'perro', 'cane', 'cão', 'chien', 'Hund', 'ɔkraman', ['inu', '犬'], ['gǒu', '狗'], ['gae', '개']],
+        ['Horse', 'caballo', 'cavallo', 'cavalo', 'cheval', 'Pferd', 'pɔnkɔ', ['uma', '馬'], ['mǎ', '马'], ['mal', '말']],
+        ['Cow', 'vaca', 'mucca', 'vaca', 'vache', 'Kuh', 'nantwi', ['ushi', '牛'], ['niú', '牛'], ['so', '소']],
+        ['Pig', 'cerdo', 'maiale', 'porco', 'cochon', 'Schwein', 'prako', ['buta', '豚'], ['zhū', '猪'], ['dwaeji', '돼지']],
+        ['Bird', 'pájaro', 'uccello', 'pássaro', 'oiseau', 'Vogel', 'anomaa', ['tori', '鳥'], ['niǎo', '鸟'], ['sae', '새']],
+        ['Fish', 'pez', 'pesce', 'peixe', 'poisson', 'Fisch', 'apataa', ['sakana', '魚'], ['yú', '鱼'], ['mulgogi', '물고기']],
+        ['Rabbit', 'conejo', 'coniglio', 'coelho', 'lapin', 'Hase', 'adanko', ['usagi', 'うさぎ'], ['tùzi', '兔子'], ['tokki', '토끼']],
+        ['Lion', 'león', 'leone', 'leão', 'lion', 'Löwe', 'gyata', ['raion', 'ライオン'], ['shīzi', '狮子'], ['saja', '사자']],
+        ['Bear', 'oso', 'orso', 'urso', 'ours', 'Bär', 'sisire', ['kuma', '熊'], ['xióng', '熊'], ['gom', '곰']],
+        ['Mouse', 'ratón', 'topo', 'rato', 'souris', 'Maus', 'akura', ['nezumi', 'ねずみ'], ['lǎoshǔ', '老鼠'], ['jwi', '쥐']],
+        ['Monkey', 'mono', 'scimmia', 'macaco', 'singe', 'Affe', 'adoe', ['saru', '猿'], ['hóuzi', '猴子'], ['wonsungi', '원숭이']],
+        ['Elephant', 'elefante', 'elefante', 'elefante', 'éléphant', 'Elefant', 'ɔsono', ['zō', '象'], ['dàxiàng', '大象'], ['kokkiri', '코끼리']],
+        ['Snake', 'serpiente', 'serpente', 'cobra', 'serpent', 'Schlange', 'ɔwɔ', ['hebi', '蛇'], ['shé', '蛇'], ['baem', '뱀']],
       ],
       'Food': [
-        ['Bread', 'pan', 'pane', 'pão', 'pain', 'Brot', ['pan', 'パン'], ['miànbāo', '面包'], ['ppang', '빵']],
-        ['Cheese', 'queso', 'formaggio', 'queijo', 'fromage', 'Käse', ['chīzu', 'チーズ'], ['nǎilào', '奶酪'], ['chijeu', '치즈']],
-        ['Rice', 'arroz', 'riso', 'arroz', 'riz', 'Reis', ['gohan', 'ご飯'], ['mǐfàn', '米饭'], ['bap', '밥']],
-        ['Egg', 'huevo', 'uovo', 'ovo', 'œuf', 'Ei', ['tamago', '卵'], ['jīdàn', '鸡蛋'], ['gyeran', '계란']],
-        ['Apple', 'manzana', 'mela', 'maçã', 'pomme', 'Apfel', ['ringo', 'りんご'], ['píngguǒ', '苹果'], ['sagwa', '사과']],
-        ['Meat', 'carne', 'carne', 'carne', 'viande', 'Fleisch', ['niku', '肉'], ['ròu', '肉'], ['gogi', '고기']],
-        ['Soup', 'sopa', 'zuppa', 'sopa', 'soupe', 'Suppe', ['sūpu', 'スープ'], ['tāng', '汤'], ['guk', '국']],
-        ['Cake', 'tarta', 'torta', 'bolo', 'gâteau', 'Kuchen', ['kēki', 'ケーキ'], ['dàngāo', '蛋糕'], ['keikeu', '케이크']],
-        ['Salt', 'sal', 'sale', 'sal', 'sel', 'Salz', ['shio', '塩'], ['yán', '盐'], ['sogeum', '소금']],
-        ['Sugar', 'azúcar', 'zucchero', 'açúcar', 'sucre', 'Zucker', ['satō', '砂糖'], ['táng', '糖'], ['seoltang', '설탕']],
-        ['Orange', 'naranja', 'arancia', 'laranja', 'orange', 'Orange', ['orenji', 'オレンジ'], ['chéngzi', '橙子'], ['orenji', '오렌지']],
-        ['Grape', 'uva', 'uva', 'uva', 'raisin', 'Traube', ['budō', 'ぶどう'], ['pútao', '葡萄'], ['podo', '포도']],
-        ['Strawberry', 'fresa', 'fragola', 'morango', 'fraise', 'Erdbeere', ['ichigo', 'いちご'], ['cǎoméi', '草莓'], ['ttalgi', '딸기']],
+        ['Bread', 'pan', 'pane', 'pão', 'pain', 'Brot', 'paanoo', ['pan', 'パン'], ['miànbāo', '面包'], ['ppang', '빵']],
+        ['Cheese', 'queso', 'formaggio', 'queijo', 'fromage', 'Käse', 'kyiisi', ['chīzu', 'チーズ'], ['nǎilào', '奶酪'], ['chijeu', '치즈']],
+        ['Rice', 'arroz', 'riso', 'arroz', 'riz', 'Reis', 'ɛmo', ['gohan', 'ご飯'], ['mǐfàn', '米饭'], ['bap', '밥']],
+        ['Egg', 'huevo', 'uovo', 'ovo', 'œuf', 'Ei', 'kosua', ['tamago', '卵'], ['jīdàn', '鸡蛋'], ['gyeran', '계란']],
+        ['Apple', 'manzana', 'mela', 'maçã', 'pomme', 'Apfel', 'aprɛ', ['ringo', 'りんご'], ['píngguǒ', '苹果'], ['sagwa', '사과']],
+        ['Meat', 'carne', 'carne', 'carne', 'viande', 'Fleisch', 'nam', ['niku', '肉'], ['ròu', '肉'], ['gogi', '고기']],
+        ['Soup', 'sopa', 'zuppa', 'sopa', 'soupe', 'Suppe', 'nkwan', ['sūpu', 'スープ'], ['tāng', '汤'], ['guk', '국']],
+        ['Cake', 'tarta', 'torta', 'bolo', 'gâteau', 'Kuchen', 'keeki', ['kēki', 'ケーキ'], ['dàngāo', '蛋糕'], ['keikeu', '케이크']],
+        ['Salt', 'sal', 'sale', 'sal', 'sel', 'Salz', 'nkyene', ['shio', '塩'], ['yán', '盐'], ['sogeum', '소금']],
+        ['Sugar', 'azúcar', 'zucchero', 'açúcar', 'sucre', 'Zucker', 'asikyire', ['satō', '砂糖'], ['táng', '糖'], ['seoltang', '설탕']],
+        ['Orange', 'naranja', 'arancia', 'laranja', 'orange', 'Orange', 'ankaa', ['orenji', 'オレンジ'], ['chéngzi', '橙子'], ['orenji', '오렌지']],
+        ['Grape', 'uva', 'uva', 'uva', 'raisin', 'Traube', 'bobe', ['budō', 'ぶどう'], ['pútao', '葡萄'], ['podo', '포도']],
+        ['Strawberry', 'fresa', 'fragola', 'morango', 'fraise', 'Erdbeere', 'strɔberi', ['ichigo', 'いちご'], ['cǎoméi', '草莓'], ['ttalgi', '딸기']],
       ],
       'Drinks': [
-        ['Water', 'agua', 'acqua', 'água', 'eau', 'Wasser', ['mizu', '水'], ['shuǐ', '水'], ['mul', '물']],
-        ['Milk', 'leche', 'latte', 'leite', 'lait', 'Milch', ['gyūnyū', '牛乳'], ['niúnǎi', '牛奶'], ['uyu', '우유']],
-        ['Tea', 'té', 'tè', 'chá', 'thé', 'Tee', ['ocha', 'お茶'], ['chá', '茶'], ['cha', '차']],
-        ['Coffee', 'café', 'caffè', 'café', 'café', 'Kaffee', ['kōhī', 'コーヒー'], ['kāfēi', '咖啡'], ['keopi', '커피']],
-        ['Wine', 'vino', 'vino', 'vinho', 'vin', 'Wein', ['wain', 'ワイン'], ['pútaojiǔ', '葡萄酒'], ['wain', '와인']],
-        ['Beer', 'cerveza', 'birra', 'cerveja', 'bière', 'Bier', ['bīru', 'ビール'], ['píjiǔ', '啤酒'], ['maekju', '맥주']],
-        ['Juice', 'zumo', 'succo', 'suco', 'jus', 'Saft', ['jūsu', 'ジュース'], ['guǒzhī', '果汁'], ['jusu', '주스']],
+        ['Water', 'agua', 'acqua', 'água', 'eau', 'Wasser', 'nsuo', ['mizu', '水'], ['shuǐ', '水'], ['mul', '물']],
+        ['Milk', 'leche', 'latte', 'leite', 'lait', 'Milch', 'nufusuo', ['gyūnyū', '牛乳'], ['niúnǎi', '牛奶'], ['uyu', '우유']],
+        ['Tea', 'té', 'tè', 'chá', 'thé', 'Tee', 'tii', ['ocha', 'お茶'], ['chá', '茶'], ['cha', '차']],
+        ['Coffee', 'café', 'caffè', 'café', 'café', 'Kaffee', 'kɔfe', ['kōhī', 'コーヒー'], ['kāfēi', '咖啡'], ['keopi', '커피']],
+        ['Wine', 'vino', 'vino', 'vinho', 'vin', 'Wein', 'bobesa', ['wain', 'ワイン'], ['pútaojiǔ', '葡萄酒'], ['wain', '와인']],
+        ['Beer', 'cerveza', 'birra', 'cerveja', 'bière', 'Bier', 'bia', ['bīru', 'ビール'], ['píjiǔ', '啤酒'], ['maekju', '맥주']],
+        ['Juice', 'zumo', 'succo', 'suco', 'jus', 'Saft', 'aduaba nsuo', ['jūsu', 'ジュース'], ['guǒzhī', '果汁'], ['jusu', '주스']],
       ],
       'Nature': [
-        ['Sun', 'sol', 'sole', 'sol', 'soleil', 'Sonne', ['taiyō', '太陽'], ['tàiyáng', '太阳'], ['hae', '해']],
-        ['Moon', 'luna', 'luna', 'lua', 'lune', 'Mond', ['tsuki', '月'], ['yuèliang', '月亮'], ['dal', '달']],
-        ['Star', 'estrella', 'stella', 'estrela', 'étoile', 'Stern', ['hoshi', '星'], ['xīngxing', '星星'], ['byeol', '별']],
-        ['Sky', 'cielo', 'cielo', 'céu', 'ciel', 'Himmel', ['sora', '空'], ['tiānkōng', '天空'], ['haneul', '하늘']],
-        ['Sea', 'mar', 'mare', 'mar', 'mer', 'Meer', ['umi', '海'], ['hǎi', '海'], ['bada', '바다']],
-        ['River', 'río', 'fiume', 'rio', 'rivière', 'Fluss', ['kawa', '川'], ['hé', '河'], ['gang', '강']],
-        ['Mountain', 'montaña', 'montagna', 'montanha', 'montagne', 'Berg', ['yama', '山'], ['shān', '山'], ['san', '산']],
-        ['Tree', 'árbol', 'albero', 'árvore', 'arbre', 'Baum', ['ki', '木'], ['shù', '树'], ['namu', '나무']],
-        ['Flower', 'flor', 'fiore', 'flor', 'fleur', 'Blume', ['hana', '花'], ['huā', '花'], ['kkot', '꽃']],
-        ['Stone', 'piedra', 'pietra', 'pedra', 'pierre', 'Stein', ['ishi', '石'], ['shítou', '石头'], ['dol', '돌']],
-        ['Island', 'isla', 'isola', 'ilha', 'île', 'Insel', ['shima', '島'], ['dǎo', '岛'], ['seom', '섬']],
-        ['Cloud', 'nube', 'nuvola', 'nuvem', 'nuage', 'Wolke', ['kumo', '雲'], ['yún', '云'], ['gureum', '구름']],
+        ['Sun', 'sol', 'sole', 'sol', 'soleil', 'Sonne', 'owia', ['taiyō', '太陽'], ['tàiyáng', '太阳'], ['hae', '해']],
+        ['Moon', 'luna', 'luna', 'lua', 'lune', 'Mond', 'ɔsram', ['tsuki', '月'], ['yuèliang', '月亮'], ['dal', '달']],
+        ['Star', 'estrella', 'stella', 'estrela', 'étoile', 'Stern', 'nsoromma', ['hoshi', '星'], ['xīngxing', '星星'], ['byeol', '별']],
+        ['Sky', 'cielo', 'cielo', 'céu', 'ciel', 'Himmel', 'wim', ['sora', '空'], ['tiānkōng', '天空'], ['haneul', '하늘']],
+        ['Sea', 'mar', 'mare', 'mar', 'mer', 'Meer', 'po', ['umi', '海'], ['hǎi', '海'], ['bada', '바다']],
+        ['River', 'río', 'fiume', 'rio', 'rivière', 'Fluss', 'asuo', ['kawa', '川'], ['hé', '河'], ['gang', '강']],
+        ['Mountain', 'montaña', 'montagna', 'montanha', 'montagne', 'Berg', 'bepɔ', ['yama', '山'], ['shān', '山'], ['san', '산']],
+        ['Tree', 'árbol', 'albero', 'árvore', 'arbre', 'Baum', 'dua', ['ki', '木'], ['shù', '树'], ['namu', '나무']],
+        ['Flower', 'flor', 'fiore', 'flor', 'fleur', 'Blume', 'nhwiren', ['hana', '花'], ['huā', '花'], ['kkot', '꽃']],
+        ['Stone', 'piedra', 'pietra', 'pedra', 'pierre', 'Stein', 'ɔbo', ['ishi', '石'], ['shítou', '石头'], ['dol', '돌']],
+        ['Island', 'isla', 'isola', 'ilha', 'île', 'Insel', 'supɔ', ['shima', '島'], ['dǎo', '岛'], ['seom', '섬']],
+        ['Cloud', 'nube', 'nuvola', 'nuvem', 'nuage', 'Wolke', 'omununkum', ['kumo', '雲'], ['yún', '云'], ['gureum', '구름']],
       ],
       'Weather': [
-        ['Rain', 'lluvia', 'pioggia', 'chuva', 'pluie', 'Regen', ['ame', '雨'], ['yǔ', '雨'], ['bi', '비']],
-        ['Snow', 'nieve', 'neve', 'neve', 'neige', 'Schnee', ['yuki', '雪'], ['xuě', '雪'], ['nun', '눈']],
-        ['Wind', 'viento', 'vento', 'vento', 'vent', 'Wind', ['kaze', '風'], ['fēng', '风'], ['baram', '바람']],
-        ['Fire', 'fuego', 'fuoco', 'fogo', 'feu', 'Feuer', ['hi', '火'], ['huǒ', '火'], ['bul', '불']],
-        ['Light', 'luz', 'luce', 'luz', 'lumière', 'Licht', ['hikari', '光'], ['guāng', '光'], ['bit', '빛']],
-        ['Summer', 'verano', 'estate', 'verão', 'été', 'Sommer', ['natsu', '夏'], ['xiàtiān', '夏天'], ['yeoreum', '여름']],
-        ['Winter', 'invierno', 'inverno', 'inverno', 'hiver', 'Winter', ['fuyu', '冬'], ['dōngtiān', '冬天'], ['gyeoul', '겨울']],
-        ['Spring', 'primavera', 'primavera', 'primavera', 'printemps', 'Frühling', ['haru', '春'], ['chūntiān', '春天'], ['bom', '봄']],
-        ['Autumn', 'otoño', 'autunno', 'outono', 'automne', 'Herbst', ['aki', '秋'], ['qiūtiān', '秋天'], ['gaeul', '가을']],
+        ['Rain', 'lluvia', 'pioggia', 'chuva', 'pluie', 'Regen', 'osu', ['ame', '雨'], ['yǔ', '雨'], ['bi', '비']],
+        ['Snow', 'nieve', 'neve', 'neve', 'neige', 'Schnee', 'sukyerɛmma', ['yuki', '雪'], ['xuě', '雪'], ['nun', '눈']],
+        ['Wind', 'viento', 'vento', 'vento', 'vent', 'Wind', 'mframa', ['kaze', '風'], ['fēng', '风'], ['baram', '바람']],
+        ['Fire', 'fuego', 'fuoco', 'fogo', 'feu', 'Feuer', 'ogya', ['hi', '火'], ['huǒ', '火'], ['bul', '불']],
+        ['Light', 'luz', 'luce', 'luz', 'lumière', 'Licht', 'hann', ['hikari', '光'], ['guāng', '光'], ['bit', '빛']],
+        ['Summer', 'verano', 'estate', 'verão', 'été', 'Sommer', 'ahuhurubere', ['natsu', '夏'], ['xiàtiān', '夏天'], ['yeoreum', '여름']],
+        ['Winter', 'invierno', 'inverno', 'inverno', 'hiver', 'Winter', 'awɔbere', ['fuyu', '冬'], ['dōngtiān', '冬天'], ['gyeoul', '겨울']],
+        ['Spring', 'primavera', 'primavera', 'primavera', 'printemps', 'Frühling', 'asusowbere', ['haru', '春'], ['chūntiān', '春天'], ['bom', '봄']],
+        ['Autumn', 'otoño', 'autunno', 'outono', 'automne', 'Herbst', 'ahahantɔbere', ['aki', '秋'], ['qiūtiān', '秋天'], ['gaeul', '가을']],
       ],
       'Body': [
-        ['Hand', 'mano', 'mano', 'mão', 'main', 'Hand', ['te', '手'], ['shǒu', '手'], ['son', '손']],
-        ['Eye', 'ojo', 'occhio', 'olho', 'œil', 'Auge', ['me', '目'], ['yǎnjing', '眼睛'], ['nun', '눈']],
-        ['Heart', 'corazón', 'cuore', 'coração', 'cœur', 'Herz', ['kokoro', '心'], ['xīn', '心'], ['simjang', '심장']],
-        ['Head', 'cabeza', 'testa', 'cabeça', 'tête', 'Kopf', ['atama', '頭'], ['tóu', '头'], ['meori', '머리']],
-        ['Mouth', 'boca', 'bocca', 'boca', 'bouche', 'Mund', ['kuchi', '口'], ['zuǐ', '嘴'], ['ip', '입']],
-        ['Nose', 'nariz', 'naso', 'nariz', 'nez', 'Nase', ['hana', '鼻'], ['bízi', '鼻子'], ['ko', '코']],
-        ['Ear', 'oreja', 'orecchio', 'orelha', 'oreille', 'Ohr', ['mimi', '耳'], ['ěrduo', '耳朵'], ['gwi', '귀']],
-        ['Foot', 'pie', 'piede', 'pé', 'pied', 'Fuß', ['ashi', '足'], ['jiǎo', '脚'], ['bal', '발']],
-        ['Hair', 'pelo', 'capelli', 'cabelo', 'cheveux', 'Haare', ['kami', '髪'], ['tóufa', '头发'], ['meorikarak', '머리카락']],
-        ['Tooth', 'diente', 'dente', 'dente', 'dent', 'Zahn', ['ha', '歯'], ['yá', '牙'], ['chia', '치아']],
+        ['Hand', 'mano', 'mano', 'mão', 'main', 'Hand', 'nsa', ['te', '手'], ['shǒu', '手'], ['son', '손']],
+        ['Eye', 'ojo', 'occhio', 'olho', 'œil', 'Auge', 'ani', ['me', '目'], ['yǎnjing', '眼睛'], ['nun', '눈']],
+        ['Heart', 'corazón', 'cuore', 'coração', 'cœur', 'Herz', 'akoma', ['kokoro', '心'], ['xīn', '心'], ['simjang', '심장']],
+        ['Head', 'cabeza', 'testa', 'cabeça', 'tête', 'Kopf', 'ti', ['atama', '頭'], ['tóu', '头'], ['meori', '머리']],
+        ['Mouth', 'boca', 'bocca', 'boca', 'bouche', 'Mund', 'ano', ['kuchi', '口'], ['zuǐ', '嘴'], ['ip', '입']],
+        ['Nose', 'nariz', 'naso', 'nariz', 'nez', 'Nase', 'hwene', ['hana', '鼻'], ['bízi', '鼻子'], ['ko', '코']],
+        ['Ear', 'oreja', 'orecchio', 'orelha', 'oreille', 'Ohr', 'aso', ['mimi', '耳'], ['ěrduo', '耳朵'], ['gwi', '귀']],
+        ['Foot', 'pie', 'piede', 'pé', 'pied', 'Fuß', 'nan', ['ashi', '足'], ['jiǎo', '脚'], ['bal', '발']],
+        ['Hair', 'pelo', 'capelli', 'cabelo', 'cheveux', 'Haare', 'nwi', ['kami', '髪'], ['tóufa', '头发'], ['meorikarak', '머리카락']],
+        ['Tooth', 'diente', 'dente', 'dente', 'dent', 'Zahn', 'se', ['ha', '歯'], ['yá', '牙'], ['chia', '치아']],
       ],
       'People': [
-        ['Mother', 'madre', 'madre', 'mãe', 'mère', 'Mutter', ['okāsan', 'お母さん'], ['māma', '妈妈'], ['eomeoni', '어머니']],
-        ['Father', 'padre', 'padre', 'pai', 'père', 'Vater', ['otōsan', 'お父さん'], ['bàba', '爸爸'], ['abeoji', '아버지']],
-        ['Brother', 'hermano', 'fratello', 'irmão', 'frère', 'Bruder', ['ani', '兄'], ['gēge', '哥哥'], ['hyeong', '형']],
-        ['Sister', 'hermana', 'sorella', 'irmã', 'sœur', 'Schwester', ['ane', '姉'], ['jiějie', '姐姐'], ['eonni', '언니']],
-        ['Friend', 'amigo', 'amico', 'amigo', 'ami', 'Freund', ['tomodachi', '友達'], ['péngyou', '朋友'], ['chingu', '친구']],
-        ['Child', 'niño', 'bambino', 'criança', 'enfant', 'Kind', ['kodomo', '子供'], ['háizi', '孩子'], ['ai', '아이']],
-        ['Teacher', 'maestro', 'insegnante', 'professor', 'professeur', 'Lehrer', ['sensei', '先生'], ['lǎoshī', '老师'], ['seonsaengnim', '선생님']],
-        ['Doctor', 'médico', 'medico', 'médico', 'médecin', 'Arzt', ['isha', '医者'], ['yīshēng', '医生'], ['uisa', '의사']],
-        ['King', 'rey', 're', 'rei', 'roi', 'König', ['ō', '王'], ['guówáng', '国王'], ['wang', '왕']],
-        ['Queen', 'reina', 'regina', 'rainha', 'reine', 'Königin', ['joō', '女王'], ['nǚwáng', '女王'], ['yeowang', '여왕']],
-        ['Love', 'amor', 'amore', 'amor', 'amour', 'Liebe', ['ai', '愛'], ['ài', '爱'], ['sarang', '사랑']],
+        ['Mother', 'madre', 'madre', 'mãe', 'mère', 'Mutter', 'ɛna', ['okāsan', 'お母さん'], ['māma', '妈妈'], ['eomeoni', '어머니']],
+        ['Father', 'padre', 'padre', 'pai', 'père', 'Vater', 'agya', ['otōsan', 'お父さん'], ['bàba', '爸爸'], ['abeoji', '아버지']],
+        ['Brother', 'hermano', 'fratello', 'irmão', 'frère', 'Bruder', 'nuabarima', ['ani', '兄'], ['gēge', '哥哥'], ['hyeong', '형']],
+        ['Sister', 'hermana', 'sorella', 'irmã', 'sœur', 'Schwester', 'nuabaa', ['ane', '姉'], ['jiějie', '姐姐'], ['eonni', '언니']],
+        ['Friend', 'amigo', 'amico', 'amigo', 'ami', 'Freund', 'adamfo', ['tomodachi', '友達'], ['péngyou', '朋友'], ['chingu', '친구']],
+        ['Child', 'niño', 'bambino', 'criança', 'enfant', 'Kind', 'abofra', ['kodomo', '子供'], ['háizi', '孩子'], ['ai', '아이']],
+        ['Teacher', 'maestro', 'insegnante', 'professor', 'professeur', 'Lehrer', 'ɔkyerɛkyerɛfo', ['sensei', '先生'], ['lǎoshī', '老师'], ['seonsaengnim', '선생님']],
+        ['Doctor', 'médico', 'medico', 'médico', 'médecin', 'Arzt', 'dɔkota', ['isha', '医者'], ['yīshēng', '医生'], ['uisa', '의사']],
+        ['King', 'rey', 're', 'rei', 'roi', 'König', 'ɔhene', ['ō', '王'], ['guówáng', '国王'], ['wang', '왕']],
+        ['Queen', 'reina', 'regina', 'rainha', 'reine', 'Königin', 'ɔhemmaa', ['joō', '女王'], ['nǚwáng', '女王'], ['yeowang', '여왕']],
+        ['Love', 'amor', 'amore', 'amor', 'amour', 'Liebe', 'ɔdɔ', ['ai', '愛'], ['ài', '爱'], ['sarang', '사랑']],
       ],
       'Home': [
-        ['House', 'casa', 'casa', 'casa', 'maison', 'Haus', ['ie', '家'], ['fángzi', '房子'], ['jip', '집']],
-        ['Door', 'puerta', 'porta', 'porta', 'porte', 'Tür', ['doa', 'ドア'], ['mén', '门'], ['mun', '문']],
-        ['Window', 'ventana', 'finestra', 'janela', 'fenêtre', 'Fenster', ['mado', '窓'], ['chuānghu', '窗户'], ['changmun', '창문']],
-        ['Table', 'mesa', 'tavolo', 'mesa', 'table', 'Tisch', ['tēburu', 'テーブル'], ['zhuōzi', '桌子'], ['takja', '탁자']],
-        ['Chair', 'silla', 'sedia', 'cadeira', 'chaise', 'Stuhl', ['isu', '椅子'], ['yǐzi', '椅子'], ['uija', '의자']],
-        ['Bed', 'cama', 'letto', 'cama', 'lit', 'Bett', ['beddo', 'ベッド'], ['chuáng', '床'], ['chimdae', '침대']],
-        ['Key', 'llave', 'chiave', 'chave', 'clé', 'Schlüssel', ['kagi', '鍵'], ['yàoshi', '钥匙'], ['yeolsoe', '열쇠']],
-        ['Book', 'libro', 'libro', 'livro', 'livre', 'Buch', ['hon', '本'], ['shū', '书'], ['chaek', '책']],
-        ['Clock', 'reloj', 'orologio', 'relógio', 'horloge', 'Uhr', ['tokei', '時計'], ['zhōng', '钟'], ['sigye', '시계']],
-        ['Mirror', 'espejo', 'specchio', 'espelho', 'miroir', 'Spiegel', ['kagami', '鏡'], ['jìngzi', '镜子'], ['geoul', '거울']],
+        ['House', 'casa', 'casa', 'casa', 'maison', 'Haus', 'efie', ['ie', '家'], ['fángzi', '房子'], ['jip', '집']],
+        ['Door', 'puerta', 'porta', 'porta', 'porte', 'Tür', 'ɛpono', ['doa', 'ドア'], ['mén', '门'], ['mun', '문']],
+        ['Window', 'ventana', 'finestra', 'janela', 'fenêtre', 'Fenster', 'mpoma', ['mado', '窓'], ['chuānghu', '窗户'], ['changmun', '창문']],
+        ['Table', 'mesa', 'tavolo', 'mesa', 'table', 'Tisch', 'ɛpon', ['tēburu', 'テーブル'], ['zhuōzi', '桌子'], ['takja', '탁자']],
+        ['Chair', 'silla', 'sedia', 'cadeira', 'chaise', 'Stuhl', 'akonnwa', ['isu', '椅子'], ['yǐzi', '椅子'], ['uija', '의자']],
+        ['Bed', 'cama', 'letto', 'cama', 'lit', 'Bett', 'mpa', ['beddo', 'ベッド'], ['chuáng', '床'], ['chimdae', '침대']],
+        ['Key', 'llave', 'chiave', 'chave', 'clé', 'Schlüssel', 'safoa', ['kagi', '鍵'], ['yàoshi', '钥匙'], ['yeolsoe', '열쇠']],
+        ['Book', 'libro', 'libro', 'livro', 'livre', 'Buch', 'nwoma', ['hon', '本'], ['shū', '书'], ['chaek', '책']],
+        ['Clock', 'reloj', 'orologio', 'relógio', 'horloge', 'Uhr', 'dɔnhwerɛ', ['tokei', '時計'], ['zhōng', '钟'], ['sigye', '시계']],
+        ['Mirror', 'espejo', 'specchio', 'espelho', 'miroir', 'Spiegel', 'ahwehwɛ', ['kagami', '鏡'], ['jìngzi', '镜子'], ['geoul', '거울']],
       ],
       'Travel': [
-        ['Car', 'coche', 'macchina', 'carro', 'voiture', 'Auto', ['kuruma', '車'], ['qìchē', '汽车'], ['jadongcha', '자동차']],
-        ['Train', 'tren', 'treno', 'trem', 'train', 'Zug', ['densha', '電車'], ['huǒchē', '火车'], ['gicha', '기차']],
-        ['Boat', 'barco', 'barca', 'barco', 'bateau', 'Boot', ['fune', '船'], ['chuán', '船'], ['bae', '배']],
-        ['Bicycle', 'bicicleta', 'bicicletta', 'bicicleta', 'vélo', 'Fahrrad', ['jitensha', '自転車'], ['zìxíngchē', '自行车'], ['jajeongeo', '자전거']],
-        ['Airplane', 'avión', 'aereo', 'avião', 'avion', 'Flugzeug', ['hikōki', '飛行機'], ['fēijī', '飞机'], ['bihaenggi', '비행기']],
-        ['Street', 'calle', 'strada', 'rua', 'rue', 'Straße', ['michi', '道'], ['jiē', '街'], ['gil', '길']],
-        ['School', 'escuela', 'scuola', 'escola', 'école', 'Schule', ['gakkō', '学校'], ['xuéxiào', '学校'], ['hakgyo', '학교']],
-        ['Hospital', 'hospital', 'ospedale', 'hospital', 'hôpital', 'Krankenhaus', ['byōin', '病院'], ['yīyuàn', '医院'], ['byeongwon', '병원']],
-        ['Money', 'dinero', 'soldi', 'dinheiro', 'argent', 'Geld', ['okane', 'お金'], ['qián', '钱'], ['don', '돈']],
-        ['Bridge', 'puente', 'ponte', 'ponte', 'pont', 'Brücke', ['hashi', '橋'], ['qiáo', '桥'], ['dari', '다리']],
+        ['Car', 'coche', 'macchina', 'carro', 'voiture', 'Auto', 'kaa', ['kuruma', '車'], ['qìchē', '汽车'], ['jadongcha', '자동차']],
+        ['Train', 'tren', 'treno', 'trem', 'train', 'Zug', 'keteke', ['densha', '電車'], ['huǒchē', '火车'], ['gicha', '기차']],
+        ['Boat', 'barco', 'barca', 'barco', 'bateau', 'Boot', 'hyɛn', ['fune', '船'], ['chuán', '船'], ['bae', '배']],
+        ['Bicycle', 'bicicleta', 'bicicletta', 'bicicleta', 'vélo', 'Fahrrad', 'sakre', ['jitensha', '自転車'], ['zìxíngchē', '自行车'], ['jajeongeo', '자전거']],
+        ['Airplane', 'avión', 'aereo', 'avião', 'avion', 'Flugzeug', 'wiemhyɛn', ['hikōki', '飛行機'], ['fēijī', '飞机'], ['bihaenggi', '비행기']],
+        ['Street', 'calle', 'strada', 'rua', 'rue', 'Straße', 'abɔnten', ['michi', '道'], ['jiē', '街'], ['gil', '길']],
+        ['School', 'escuela', 'scuola', 'escola', 'école', 'Schule', 'sukuu', ['gakkō', '学校'], ['xuéxiào', '学校'], ['hakgyo', '학교']],
+        ['Hospital', 'hospital', 'ospedale', 'hospital', 'hôpital', 'Krankenhaus', 'ayaresabea', ['byōin', '病院'], ['yīyuàn', '医院'], ['byeongwon', '병원']],
+        ['Money', 'dinero', 'soldi', 'dinheiro', 'argent', 'Geld', 'sika', ['okane', 'お金'], ['qián', '钱'], ['don', '돈']],
+        ['Bridge', 'puente', 'ponte', 'ponte', 'pont', 'Brücke', 'twene', ['hashi', '橋'], ['qiáo', '桥'], ['dari', '다리']],
       ],
       'Day and Night': [
-        ['Day', 'día', 'giorno', 'dia', 'jour', 'Tag', ['hi', '日'], ['tiān', '天'], ['nal', '날']],
-        ['Night', 'noche', 'notte', 'noite', 'nuit', 'Nacht', ['yoru', '夜'], ['wǎnshang', '晚上'], ['bam', '밤']],
-        ['Morning', 'mañana', 'mattina', 'manhã', 'matin', 'Morgen', ['asa', '朝'], ['zǎoshang', '早上'], ['achim', '아침']],
-        ['Year', 'año', 'anno', 'ano', 'année', 'Jahr', ['toshi', '年'], ['nián', '年'], ['hae', '해']],
-        ['Week', 'semana', 'settimana', 'semana', 'semaine', 'Woche', ['shū', '週'], ['xīngqī', '星期'], ['ju', '주']],
-        ['Dream', 'sueño', 'sogno', 'sonho', 'rêve', 'Traum', ['yume', '夢'], ['mèng', '梦'], ['kkum', '꿈']],
-        ['Song', 'canción', 'canzone', 'canção', 'chanson', 'Lied', ['uta', '歌'], ['gē', '歌'], ['norae', '노래']],
-        ['Music', 'música', 'musica', 'música', 'musique', 'Musik', ['ongaku', '音楽'], ['yīnyuè', '音乐'], ['eumak', '음악']],
+        ['Day', 'día', 'giorno', 'dia', 'jour', 'Tag', 'da', ['hi', '日'], ['tiān', '天'], ['nal', '날']],
+        ['Night', 'noche', 'notte', 'noite', 'nuit', 'Nacht', 'anadwo', ['yoru', '夜'], ['wǎnshang', '晚上'], ['bam', '밤']],
+        ['Morning', 'mañana', 'mattina', 'manhã', 'matin', 'Morgen', 'anɔpa', ['asa', '朝'], ['zǎoshang', '早上'], ['achim', '아침']],
+        ['Year', 'año', 'anno', 'ano', 'année', 'Jahr', 'afe', ['toshi', '年'], ['nián', '年'], ['hae', '해']],
+        ['Week', 'semana', 'settimana', 'semana', 'semaine', 'Woche', 'nnawɔtwe', ['shū', '週'], ['xīngqī', '星期'], ['ju', '주']],
+        ['Dream', 'sueño', 'sogno', 'sonho', 'rêve', 'Traum', 'dae', ['yume', '夢'], ['mèng', '梦'], ['kkum', '꿈']],
+        ['Song', 'canción', 'canzone', 'canção', 'chanson', 'Lied', 'dwom', ['uta', '歌'], ['gē', '歌'], ['norae', '노래']],
+        ['Music', 'música', 'musica', 'música', 'musique', 'Musik', 'nnwom', ['ongaku', '音楽'], ['yīnyuè', '音乐'], ['eumak', '음악']],
       ],
       'Colours': [
-        ['Red', 'rojo', 'rosso', 'vermelho', 'rouge', 'rot', ['aka', '赤'], ['hóngsè', '红色'], ['ppalgang', '빨강']],
-        ['Blue', 'azul', 'blu', 'azul', 'bleu', 'blau', ['ao', '青'], ['lánsè', '蓝色'], ['parang', '파랑']],
-        ['Green', 'verde', 'verde', 'verde', 'vert', 'grün', ['midori', '緑'], ['lǜsè', '绿色'], ['choroksaek', '초록색']],
-        ['White', 'blanco', 'bianco', 'branco', 'blanc', 'weiß', ['shiro', '白'], ['báisè', '白色'], ['huinsaek', '흰색']],
-        ['Black', 'negro', 'nero', 'preto', 'noir', 'schwarz', ['kuro', '黒'], ['hēisè', '黑色'], ['geomjeong', '검정']],
-        ['Yellow', 'amarillo', 'giallo', 'amarelo', 'jaune', 'gelb', ['kiiro', '黄色'], ['huángsè', '黄色'], ['norang', '노랑']],
+        ['Red', 'rojo', 'rosso', 'vermelho', 'rouge', 'rot', 'kɔkɔɔ', ['aka', '赤'], ['hóngsè', '红色'], ['ppalgang', '빨강']],
+        ['Blue', 'azul', 'blu', 'azul', 'bleu', 'blau', 'bruu', ['ao', '青'], ['lánsè', '蓝色'], ['parang', '파랑']],
+        ['Green', 'verde', 'verde', 'verde', 'vert', 'grün', 'ahabammono', ['midori', '緑'], ['lǜsè', '绿色'], ['choroksaek', '초록색']],
+        ['White', 'blanco', 'bianco', 'branco', 'blanc', 'weiß', 'fitaa', ['shiro', '白'], ['báisè', '白色'], ['huinsaek', '흰색']],
+        ['Black', 'negro', 'nero', 'preto', 'noir', 'schwarz', 'tuntum', ['kuro', '黒'], ['hēisè', '黑色'], ['geomjeong', '검정']],
+        ['Yellow', 'amarillo', 'giallo', 'amarelo', 'jaune', 'gelb', 'akokɔsrade', ['kiiro', '黄色'], ['huángsè', '黄色'], ['norang', '노랑']],
       ],
       'Clothes': [
-        ['Shoe', 'zapato', 'scarpa', 'sapato', 'chaussure', 'Schuh', ['kutsu', '靴'], ['xié', '鞋'], ['sinbal', '신발']],
-        ['Hat', 'sombrero', 'cappello', 'chapéu', 'chapeau', 'Hut', ['bōshi', '帽子'], ['màozi', '帽子'], ['moja', '모자']],
-        ['Shirt', 'camisa', 'camicia', 'camisa', 'chemise', 'Hemd', ['shatsu', 'シャツ'], ['chènshān', '衬衫'], ['syeocheu', '셔츠']],
-        ['Dress', 'vestido', 'vestito', 'vestido', 'robe', 'Kleid', ['doresu', 'ドレス'], ['liányīqún', '连衣裙'], ['deureseu', '드레스']],
-        ['Bag', 'bolso', 'borsa', 'bolsa', 'sac', 'Tasche', ['kaban', 'かばん'], ['bāo', '包'], ['gabang', '가방']],
-        ['Umbrella', 'paraguas', 'ombrello', 'guarda-chuva', 'parapluie', 'Regenschirm', ['kasa', '傘'], ['sǎn', '伞'], ['usan', '우산']],
-        ['Glove', 'guante', 'guanto', 'luva', 'gant', 'Handschuh', ['tebukuro', '手袋'], ['shǒutào', '手套'], ['janggap', '장갑']],
+        ['Shoe', 'zapato', 'scarpa', 'sapato', 'chaussure', 'Schuh', 'mpaboa', ['kutsu', '靴'], ['xié', '鞋'], ['sinbal', '신발']],
+        ['Hat', 'sombrero', 'cappello', 'chapéu', 'chapeau', 'Hut', 'kyɛ', ['bōshi', '帽子'], ['màozi', '帽子'], ['moja', '모자']],
+        ['Shirt', 'camisa', 'camicia', 'camisa', 'chemise', 'Hemd', 'atadeɛ', ['shatsu', 'シャツ'], ['chènshān', '衬衫'], ['syeocheu', '셔츠']],
+        ['Dress', 'vestido', 'vestito', 'vestido', 'robe', 'Kleid', 'ntoma', ['doresu', 'ドレス'], ['liányīqún', '连衣裙'], ['deureseu', '드레스']],
+        ['Bag', 'bolso', 'borsa', 'bolsa', 'sac', 'Tasche', 'kotokuo', ['kaban', 'かばん'], ['bāo', '包'], ['gabang', '가방']],
+        ['Umbrella', 'paraguas', 'ombrello', 'guarda-chuva', 'parapluie', 'Regenschirm', 'kyiniiɛ', ['kasa', '傘'], ['sǎn', '伞'], ['usan', '우산']],
+        ['Glove', 'guante', 'guanto', 'luva', 'gant', 'Handschuh', 'nsa mpaboa', ['tebukuro', '手袋'], ['shǒutào', '手套'], ['janggap', '장갑']],
       ],
       'Post Office': [
-        ['Pen', 'bolígrafo', 'penna', 'caneta', 'stylo', 'Stift', ['pen', 'ペン'], ['bǐ', '笔'], ['pen', '펜']],
-        ['Paper', 'papel', 'carta', 'papel', 'papier', 'Papier', ['kami', '紙'], ['zhǐ', '纸'], ['jongi', '종이']],
-        ['Letter', 'carta', 'lettera', 'carta', 'lettre', 'Brief', ['tegami', '手紙'], ['xìn', '信'], ['pyeonji', '편지']],
-        ['Phone', 'teléfono', 'telefono', 'telefone', 'téléphone', 'Telefon', ['denwa', '電話'], ['diànhuà', '电话'], ['jeonhwa', '전화']],
-        ['Gift', 'regalo', 'regalo', 'presente', 'cadeau', 'Geschenk', ['purezento', 'プレゼント'], ['lǐwù', '礼物'], ['seonmul', '선물']],
+        ['Pen', 'bolígrafo', 'penna', 'caneta', 'stylo', 'Stift', 'kyerɛwdua', ['pen', 'ペン'], ['bǐ', '笔'], ['pen', '펜']],
+        ['Paper', 'papel', 'carta', 'papel', 'papier', 'Papier', 'krataa', ['kami', '紙'], ['zhǐ', '纸'], ['jongi', '종이']],
+        ['Letter', 'carta', 'lettera', 'carta', 'lettre', 'Brief', 'krataa', ['tegami', '手紙'], ['xìn', '信'], ['pyeonji', '편지']],
+        ['Phone', 'teléfono', 'telefono', 'telefone', 'téléphone', 'Telefon', 'ahomatrofoɔ', ['denwa', '電話'], ['diànhuà', '电话'], ['jeonhwa', '전화']],
+        ['Gift', 'regalo', 'regalo', 'presente', 'cadeau', 'Geschenk', 'akyɛde', ['purezento', 'プレゼント'], ['lǐwù', '礼物'], ['seonmul', '선물']],
       ],
       'Numbers': [
-        ['One', 'uno', 'uno', 'um', 'un', 'eins', ['ichi', '一'], ['yī', '一'], ['hana', '하나']],
-        ['Two', 'dos', 'due', 'dois', 'deux', 'zwei', ['ni', '二'], ['èr', '二'], ['dul', '둘']],
-        ['Three', 'tres', 'tre', 'três', 'trois', 'drei', ['san', '三'], ['sān', '三'], ['set', '셋']],
-        ['Four', 'cuatro', 'quattro', 'quatro', 'quatre', 'vier', ['yon', '四'], ['sì', '四'], ['net', '넷']],
-        ['Five', 'cinco', 'cinque', 'cinco', 'cinq', 'fünf', ['go', '五'], ['wǔ', '五'], ['daseot', '다섯']],
-        ['Six', 'seis', 'sei', 'seis', 'six', 'sechs', ['roku', '六'], ['liù', '六'], ['yeoseot', '여섯']],
-        ['Ten', 'diez', 'dieci', 'dez', 'dix', 'zehn', ['jū', '十'], ['shí', '十'], ['yeol', '열']],
+        ['One', 'uno', 'uno', 'um', 'un', 'eins', 'baako', ['ichi', '一'], ['yī', '一'], ['hana', '하나']],
+        ['Two', 'dos', 'due', 'dois', 'deux', 'zwei', 'mmienu', ['ni', '二'], ['èr', '二'], ['dul', '둘']],
+        ['Three', 'tres', 'tre', 'três', 'trois', 'drei', 'mmiɛnsa', ['san', '三'], ['sān', '三'], ['set', '셋']],
+        ['Four', 'cuatro', 'quattro', 'quatro', 'quatre', 'vier', 'ɛnan', ['yon', '四'], ['sì', '四'], ['net', '넷']],
+        ['Five', 'cinco', 'cinque', 'cinco', 'cinq', 'fünf', 'enum', ['go', '五'], ['wǔ', '五'], ['daseot', '다섯']],
+        ['Six', 'seis', 'sei', 'seis', 'six', 'sechs', 'nsia', ['roku', '六'], ['liù', '六'], ['yeoseot', '여섯']],
+        ['Ten', 'diez', 'dieci', 'dez', 'dix', 'zehn', 'edu', ['jū', '十'], ['shí', '十'], ['yeol', '열']],
       ],
     },
   };
@@ -1787,7 +2062,6 @@ table.records tr.me td {
 /* global Geo, PUZZLES, PuzzleCore, LangBuilder */
 const { VERTS, NORMALS, FACE_NAMES, FACE_ORDER, PERM, INV, OUTWARD, FACE_TRI, wordOn, twist, slotName, sub, dot, cross } = Geo;
 
-const PENALTY_SECONDS = 30;
 
 const app = document.getElementById('app');
 const topinfo = document.getElementById('topinfo');
@@ -1850,25 +2124,17 @@ function langLabel(code) {
   return l.native ? `${l.name} (${settings.native[code] ? l.native : l.roman})` : l.name;
 }
 
-// ---------------- best times (per browser) ----------------
+// ---------------- solved puzzles (per browser) ----------------
 // Kept per puzzle and per language choice, since different languages make a different puzzle.
 
-const bestKey = (id) => `${id}@${LangBuilder.signature(settings)}`;
-function loadBest() {
+const solvedKey = (id) => `${id}@${LangBuilder.signature(settings)}`;
+function loadSolved() {
   try { return JSON.parse(localStorage.getItem('wordknot-best') || '{}') || {}; } catch { return {}; }
 }
-function saveBest(id, rec) {
-  const all = loadBest();
-  all[bestKey(id)] = rec;
+function saveSolved(id) {
+  const all = loadSolved();
+  all[solvedKey(id)] = { date: new Date().toISOString() };
   try { localStorage.setItem('wordknot-best', JSON.stringify(all)); } catch {}
-}
-
-function fmtTime(ms) {
-  const t = Math.max(0, Math.floor(ms / 100));
-  const tenths = t % 10;
-  const secs = Math.floor(t / 10) % 60;
-  const mins = Math.floor(t / 600);
-  return `${mins}:${String(secs).padStart(2, '0')}.${tenths}`;
 }
 
 // ---------------- game state ----------------
@@ -1886,14 +2152,8 @@ function openPuzzle(def) {
     order: cards.map((c) => c.id),
     placement: [null, null, null, null], // {cardId, orient}
     marks: [null, null, null, null], // result of the last check per corner: true / false / null
-    start: performance.now(),
-    penalty: 0, // seconds
     checks: 0,
-    lastCheck: null,
     solved: false,
-    finalMs: 0,
-    best: loadBest()[bestKey(p.id)] || null,
-    newBest: false,
   };
   history.replaceState(null, '', `#${p.id}`);
   render();
@@ -1903,12 +2163,6 @@ function closePuzzle() {
   game = null;
   history.replaceState(null, '', location.pathname + location.search);
   render();
-}
-
-function elapsedMs() {
-  if (!game) return 0;
-  if (game.solved) return game.finalMs;
-  return performance.now() - game.start + game.penalty * 1000;
 }
 
 // Each piece has its own colour, picked by its place in the shuffled pile order (not by its id, which follows
@@ -1947,8 +2201,8 @@ function setOrient(slot, orient) {
   render();
 }
 
-// Shortcut (triple-click the timer): put every piece in its right corner, turned the right way. You still press
-// Check to finish, and the time isn't saved as a best time.
+// Shortcut (triple-click the word row under the 3D view): put every piece in its right corner, turned the right way.
+// You still press Check Solution to finish, and the puzzle isn't recorded as solved.
 function placeAllCorrectly() {
   if (game.solved) return;
   game.placement = [0, 1, 2, 3].map((s) => {
@@ -1962,36 +2216,21 @@ function placeAllCorrectly() {
   render();
 }
 
-function resetBoard() {
-  if (game.solved) return;
-  game.placement = [null, null, null, null];
-  game.marks = [null, null, null, null];
-  render();
-}
-
 function check() {
   if (game.solved) return;
   if (game.placement.some((x) => !x)) { toast('Place all 4 pieces first.'); return; }
   const correct = game.placement.map((x, s) => PuzzleCore.isCorrect(game.built, s, game.cards[x.cardId], x.orient));
   const wrong = correct.filter((ok) => !ok).length;
   game.checks++;
+  game.marks = correct;
   if (wrong === 0) {
-    game.finalMs = performance.now() - game.start + game.penalty * 1000;
     game.solved = true;
     pendingCelebrate = true;
-    game.marks = correct;
     clearTimeout(toastTimer);
     toastEl.classList.remove('show');
-      if (!game.autoPlaced && (!game.best || game.finalMs < game.best.time)) {
-      game.newBest = true;
-      game.best = { time: game.finalMs, checks: game.checks, date: new Date().toISOString() };
-      saveBest(game.puzzle.id, game.best);
-    }
+    if (!game.autoPlaced) saveSolved(game.puzzle.id);
   } else {
-    game.penalty += PENALTY_SECONDS;
-    game.marks = correct;
-    game.lastCheck = { wrong };
-    toast(`${wrong} piece${wrong === 1 ? ' is' : 's are'} wrong: +${PENALTY_SECONDS}s`);
+    toast(`${wrong} piece${wrong === 1 ? ' is' : 's are'} in the wrong place or turned the wrong way.`);
   }
   render();
 }
@@ -2004,7 +2243,6 @@ function sizes() {
   const base = narrow ? clamp(Math.floor(((w - 48) / 2 - 50) / 1.12), 70, 170) : 170;
   return {
     R: Math.round(base * 1.21), // big tetrahedron circumradius (px)
-    sceneH: Math.round((base * 2.0 + 40) * 1.2), // height of the 3D view (px)
   };
 }
 
@@ -2158,10 +2396,8 @@ function tetraHTML({ slots, hints, interactive = false, marks = null, focus = -1
     }).join('');
     return `<div class="shape3d">${pieces}${hintFaces}</div>`;
   };
-  const { sceneH } = sizes();
-  return `<div class="scene" data-r="${R}" style="height:${sceneH}px;perspective:${PERSPECTIVE}px;perspective-origin:50% 56%">
+  return `<div class="scene" data-r="${R}" style="perspective:${PERSPECTIVE}px;perspective-origin:50% 48%">
       ${layer()}
-      <div class="hint">Drag to turn the tetrahedron</div>
       ${controls}
     </div>`;
 }
@@ -2169,9 +2405,14 @@ function tetraHTML({ slots, hints, interactive = false, marks = null, focus = -1
 // A loose piece, drawn as its unfolded net: a triangle split into 4 smaller triangles, one word each
 // (the centre one inverted). Folding the 3 corner triangles up would make the piece.
 // flip draws it upside down (words still upright), so pile pieces can interlock like a strip of triangles.
-const chipSize = (big = false) => (big ? 200 : window.innerWidth < 540 ? 120 : 160);
-// How far each pile piece slides under its neighbour: half a triangle, less a small gap between the edges.
-const chipOverlap = () => chipSize() / 2 - 9;
+// The pile is one row of 4 pieces. Where there's room (the design's 600px column) they stand side by side, 139px
+// each; on narrow screens they shrink and interlock, each sliding half a triangle under its neighbour.
+const PILE_W = 600;
+const pileInner = () => Math.min(PILE_W, window.innerWidth - 32) - 26; // less the box's padding and border
+const pileSpaced = () => (pileInner() - 3 * 4) / 4 >= 120;
+const chipSize = (big = false) => (big ? 200 : pileSpaced() ? 139 : Math.floor((pileInner() - 27) / 2.5));
+// How far each pile piece slides under its neighbour (negative: a gap between them).
+const chipOverlap = () => (pileSpaced() ? -4 : chipSize() / 2 - 9);
 // ghost: an invisible stand-in, laid out like a pile piece (used to keep the pile's height constant).
 function chipHTML(card, { movable = false, big = false, flip = false, ghost = false } = {}) {
   const S = chipSize(big);
@@ -2216,28 +2457,28 @@ function langPickerHTML() {
       <h2>Languages <span class="muted" style="font-size:14px;font-weight:400">· ${n} picked, at least ${LangBuilder.MIN_LANGS}</span></h2>
       <div class="langs">${items}</div>
       <p class="muted" style="font-size:14px;margin:12px 0 0">Each face shows its English hint in 3 of these languages. For Japanese, Chinese and Korean, choose the
-        romanized spelling or the native script. Changing languages changes the words in every puzzle, so best times are kept separately for each choice.</p>
+        romanized spelling or the native script. Changing languages changes the words in every puzzle, so solved puzzles are kept separately for each choice.</p>
     </div>`;
 }
 
 function renderList() {
   topinfo.innerHTML = '';
-  const best = loadBest();
-  const solvedCount = PUZZLES.filter((p) => best[bestKey(p.id)]).length;
+  const solved = loadSolved();
+  const solvedCount = PUZZLES.filter((p) => solved[solvedKey(p.id)]).length;
   app.innerHTML = `
     <div class="narrowmax">
       ${langPickerHTML()}
       <div class="panel">
         <h1>Puzzles</h1>
-        <p class="muted">${solvedCount} of ${PUZZLES.length} solved with these languages. Best times are saved in this browser.</p>
+        <p class="muted">${solvedCount} of ${PUZZLES.length} solved with these languages.</p>
         <div class="plist">
           ${PUZZLES.map((p, i) => {
-            const b = best[bestKey(p.id)];
+            const b = solved[solvedKey(p.id)];
             return `<button class="pcard${b ? ' done' : ''}" data-open="${p.id}">
                 <span class="pnum">${i + 1}</span>
                 <span class="ptitle">${esc(p.title)}</span>
                 <span class="phints">${p.hints.map(esc).join(' · ')}</span>
-                <span class="pbest">${b ? `✓ Best ${fmtTime(b.time)}` : 'Not solved yet'}</span>
+                <span class="pbest">${b ? '✓ Solved' : 'Not solved yet'}</span>
               </button>`;
           }).join('')}
         </div>
@@ -2248,8 +2489,8 @@ function renderList() {
           <li>The big tetrahedron is built from 4 small pieces, one at each corner, with a hollow centre. Each piece has 4 words, one per side.</li>
           <li>Each of the 4 big faces has a <b>hint</b>. When solved, the 3 words showing on that face all go with its hint.</li>
           <li>At a corner, 3 of a piece's words face out and 1 faces the hollow centre, where it's hidden. Hidden words don't match any hint.</li>
-          <li>Put every piece at the right corner, turned the right way, then press <b>Check</b>.
-            A wrong check shows which pieces are wrong and adds <b>${PENALTY_SECONDS} seconds</b> to your time.</li>
+          <li>Put every piece at the right corner, turned the right way, then press <b>Check Solution</b>.
+            A wrong check shows which pieces are wrong.</li>
         </ul>
       </div>
     </div>`;
@@ -2269,8 +2510,8 @@ function inspectorHTML(focus) {
     const key = `${card.id}@${focus}`;
     const from = hiddenMark && hiddenMark.key === key ? hiddenMark.idx : idx;
     hiddenMark = { key, idx };
-    row = `<div class="wordrow ${pieceCls(card.id)}"><span class="hl" style="--i:${from}" data-to="${idx}"><small>hidden</small></span>
-        ${card.words.map((w, i) => `<button class="w${i === idx ? ' hid' : ''}" data-hideword="${i}" ${i === idx ? 'aria-current="true"' : `title="Turn the piece so this word is hidden"`}>${esc(w)}</button>`).join('')}</div>`;
+    row = `<div class="wordrow ${pieceCls(card.id)}"><span class="hl" style="--i:${from}" data-to="${idx}" aria-hidden="true"></span>
+        ${card.words.map((w, i) => `<button class="w${i === idx ? ' hid' : ''}" data-hideword="${i}" ${i === idx ? 'aria-current="true" title="Hidden"' : `title="Turn the piece so this word is hidden"`}>${esc(w)}</button>`).join('')}</div>`;
   } else {
     hiddenMark = null;
     row = `<div class="wordrow empty"><span class="w">${game.solved ? 'Solved' : 'Choose words from the pile'}</span></div>`;
@@ -2282,14 +2523,14 @@ function inspectorHTML(focus) {
 // (back to the pile), turn right. Greyed out when the selected corner is empty; gone once solved.
 // A triangle (the piece) with a curved arrow over it: clockwise for Turn Right; mirrored, anticlockwise, for Turn Left.
 const turnIcon = (cw) => `<svg viewBox="0 0 32 28" width="36" height="31" aria-hidden="true"><g${cw ? '' : ' transform="translate(32 0) scale(-1 1)"'} fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13 L23.5 25 H8.5 Z"/><path d="M6 13 A11 9 0 0 1 26 12"/><path d="M21.5 10.5 L26.2 12.4 L27.6 7.5" transform="rotate(-10 26.2 12.4)"/></g></svg>`;
-const TRASH_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TRASH_ICON = '<img src="data:image/png;base64,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" width="46" height="46" alt="">';
 function sceneControlsHTML(focus) {
   if (!game || game.solved) return '';
   const item = focus >= 0 ? game.placement[focus] : null;
   const off = item ? '' : 'disabled';
-  return `<button class="btn small scenebtn turnl" data-twist="1" data-slot-turn="${focus}" title="Turn Left" aria-label="Turn Left" ${off}>${turnIcon(false)}</button>
-    <button class="btn small scenebtn trash" data-topool="${item ? item.cardId : ''}" title="Back to the pile" aria-label="Back to the pile" ${off}>${TRASH_ICON}</button>
-    <button class="btn small scenebtn turnr" data-twist="-1" data-slot-turn="${focus}" title="Turn Right" aria-label="Turn Right" ${off}>${turnIcon(true)}</button>`;
+  return `<button class="scenebtn turnl" data-twist="1" data-slot-turn="${focus}" title="Turn Left" aria-label="Turn Left" ${off}>${turnIcon(false)}</button>
+    <button class="scenebtn trash" data-topool="${item ? item.cardId : ''}" title="Back to the pile" aria-label="Back to the pile" ${off}>${TRASH_ICON}</button>
+    <button class="scenebtn turnr" data-twist="-1" data-slot-turn="${focus}" title="Turn Right" aria-label="Turn Right" ${off}>${turnIcon(true)}</button>`;
 }
 
 // Shrink any word too wide for its column (the row has a fixed height, so words never wrap), then slide the
@@ -2320,49 +2561,22 @@ function renderPlay() {
 
   topinfo.innerHTML = `Puzzle <b>${idx + 1}</b> · ${esc(p.title)}<span class="tlangs"> · ${settings.langs.map((c) => esc(langLabel(c))).join(', ')}</span>`;
 
-  let banner;
-  if (g.solved) {
-    banner = `<div class="banner ok solved">
-        <div><b>Solved!</b> Your time: ${fmtTime(g.finalMs)} ${g.newBest ? 'New best time!' : g.best ? `Best: ${fmtTime(g.best.time)}` : ''}</div>
-      </div>`;
-  } else if (g.marks.some((m) => m === false)) {
-    const n = g.marks.filter((m) => m === false).length;
-    banner = `<div class="banner bad">${n} piece${n === 1 ? ' is' : 's are'} wrong</div>`;
-  } else {
-    banner = `<div class="banner">Match the words to their translation</div>`;
-  }
+  // Once solved, the button moves on to the next puzzle (or replays the last one).
+  const action = g.solved
+    ? `<button class="checkbtn" data-open="${(next || p).id}">${next ? 'Next Puzzle' : 'Play Again'}</button>`
+    : `<button class="checkbtn" id="check" ${full ? '' : 'disabled title="Place all 4 pieces first"'}>Check Solution</button>`;
 
-  const main = `
-    ${banner}
-    <div class="pool" data-pool="1" style="margin-bottom:14px;padding-left:${12 + chipOverlap()}px">
-      <div class="poolsizer" aria-hidden="true">${g.order.map((id) => chipHTML(g.cards[id], { ghost: true })).join('')}</div>
-      <div class="poolitems">${pool.length ? pool.map((c, i) => chipHTML(c, { movable: true, flip: i % 2 === 1 })).join('') : '<span class="empty-note">All pieces are placed. Press Check when you think it\'s right.</span>'}</div>
-    </div>
-    <div class="views">${tetraHTML({ slots, hints: g.built.hints, interactive, marks: g.marks, focus, controls: `<div id="scenectl">${sceneControlsHTML(focus)}</div>` })}</div>
-    <div id="inspector">${inspectorHTML(focus)}</div>`;
-
-  const side = `
-    <div class="panel timerpanel">
-      <div class="timerlabel">Time</div>
-      <div class="timer${g.solved ? ' done' : ''}" id="timer">${fmtTime(elapsedMs())}</div>
-      <div class="muted" style="font-size:13px">${g.penalty ? `includes +${g.penalty}s penalty` : `+${PENALTY_SECONDS}s for each wrong check`}${g.best && !g.solved ? ` · Best ${fmtTime(g.best.time)}` : ''}</div>
-      ${g.solved
-        ? `<div class="stack" style="margin-top:14px">
-            ${next ? `<button class="btn primary" data-open="${next.id}" style="width:100%">Next puzzle: ${esc(next.title)}</button>` : ''}
-            <button class="btn" data-open="${p.id}" style="width:100%">Play again</button>
-            <button class="btn" id="back" style="width:100%">All puzzles</button>
-          </div>`
-        : `<div class="stack" style="margin-top:14px">
-            <button class="btn primary" id="check" style="width:100%" ${full ? '' : 'disabled'}>${full ? 'Check' : `Place all 4 pieces (${g.placement.filter(Boolean).length}/4)`}</button>
-            <div class="row"><button class="btn small" id="reset">Clear board</button><button class="btn small" id="back">All puzzles</button></div>
-          </div>`}
+  app.innerHTML = `<div class="play">
+      <div class="pool" data-pool="1" style="padding-left:${12 + chipOverlap()}px">
+        <div class="poolsizer" aria-hidden="true">${g.order.map((id) => chipHTML(g.cards[id], { ghost: true })).join('')}</div>
+        <div class="poolitems">${pool.length ? pool.map((c, i) => chipHTML(c, { movable: true, flip: i % 2 === 1 })).join('') : `<span class="empty-note">${g.solved ? 'Solved!' : 'All pieces are placed.'}</span>`}</div>
+      </div>
+      ${tetraHTML({ slots, hints: g.built.hints, interactive, marks: g.marks, focus, controls: `<div id="scenectl">${sceneControlsHTML(focus)}</div>` })}
+      <div id="inspector">${inspectorHTML(focus)}</div>
+      ${action}
     </div>`;
-
-  app.innerHTML = `<div class="layout"><div class="panel">${main}</div><div>${side}</div></div>`;
-  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
-  on('check', check);
-  on('reset', resetBoard);
-  on('back', closePuzzle);
+  const checkBtn = document.getElementById('check');
+  if (checkBtn) checkBtn.onclick = check;
 }
 
 function render() {
@@ -2495,13 +2709,6 @@ function celebrate() {
   celebrateFrame = requestAnimationFrame(frame);
 }
 
-// Live timer: update just the clock text.
-setInterval(() => {
-  if (!game || game.solved) return;
-  const el = document.getElementById('timer');
-  if (el) el.textContent = fmtTime(elapsedMs());
-}, 100);
-
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
@@ -2564,7 +2771,7 @@ app.addEventListener('click', (e) => {
     return;
   }
   if (!game || game.solved) return;
-  if (e.detail === 3 && e.target.closest('#timer')) { placeAllCorrectly(); return; }
+  if (e.detail === 3 && e.target.closest('.wordrow')) { placeAllCorrectly(); return; }
   const twistBtn = e.target.closest('[data-twist]');
   if (twistBtn) {
     const slot = Number(twistBtn.dataset.slotTurn);
