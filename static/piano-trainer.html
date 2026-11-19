@@ -76,7 +76,19 @@ h2:first-child { margin-top: 0; }
 .chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .group-label { font-size: .75rem; color: var(--muted); margin: 6px 0 2px; }
 .option-list .group-label:not(:first-child) { margin-top: 10px; }
-.quality-groups { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.prog-groups { display: grid; gap: 12px; margin-top: 10px; }
+.prog-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.prog-chip { cursor: pointer; }
+.prog-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.prog-chip span {
+  display: flex; flex-direction: column; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface-2); transition: all .15s;
+}
+.prog-chip b { font-weight: 600; font-size: .88rem; }
+.prog-chip small { font-family: var(--serif); color: var(--muted); font-size: .8rem; }
+.prog-chip input:checked + span { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
+.prog-chip input:checked + span small { color: var(--accent); }
+.prog-chip input:focus-visible + span { outline: 2px solid var(--held); outline-offset: 2px; }
 .chip-group .group-label { margin: 0 0 6px; }
 .warn { color: var(--accent); min-height: 0; }
 .warn:empty { display: none; }
@@ -165,6 +177,27 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
 }
 .chord-name .qual { font-size: .55em; vertical-align: .55em; margin-left: .04em; }
 .chord-name.solved { color: var(--good); }
+.prog-line { color: var(--muted); font-size: .85rem; margin-top: 4px; }
+.prog-line b { color: var(--text); font-weight: 600; }
+.chord-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 28px; }
+.chord-current.enter { animation: chord-in .28s ease-out; }
+@keyframes chord-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+.chord-numeral { font-family: var(--serif); color: var(--accent); font-size: 1.15rem; margin-top: -4px; }
+.upcoming { display: flex; align-items: flex-end; gap: 22px; justify-self: start; text-align: left; }
+.up-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); align-self: center; writing-mode: vertical-rl; transform: rotate(180deg); }
+.up { opacity: .6; }
+.up + .up { opacity: .38; }
+.up-name { font-family: var(--serif); font-weight: 600; font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.1; white-space: nowrap; }
+.up-name .qual { font-size: .6em; vertical-align: .5em; }
+.up-num { font-family: var(--serif); color: var(--muted); font-size: .9rem; }
+.up.new { border-left: 2px solid var(--border); padding-left: 14px; }
+.up-new { font-size: .68rem; color: var(--accent); max-width: 150px; line-height: 1.25; margin-bottom: 4px; }
+@media (max-width: 760px) {
+  .chord-row { grid-template-columns: 1fr; gap: 10px; }
+  .chord-row > div:first-child { display: none; }
+  .upcoming { justify-self: center; }
+  .up-label { writing-mode: horizontal-tb; transform: none; }
+}
 .chord-name.shake { animation: shake .4s; color: var(--bad); }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -273,8 +306,9 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
           <p class="sub">Pick one or more. Each chord uses one of them at random.</p>
           <div id="type-list" class="option-list"></div>
 
-          <h2>Chord qualities</h2>
-          <div id="quality-list" class="quality-groups"></div>
+          <h2>Progressions</h2>
+          <p class="sub">Each progression is played start to finish in a random key, then a new one is picked.</p>
+          <div id="progression-list" class="prog-groups"></div>
           <p class="sub warn" id="combo-note"></p>
 
           <h2>Spelling</h2>
@@ -344,7 +378,15 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
 
       <div class="prompt">
         <div id="prompt-type" class="prompt-type"></div>
-        <div id="chord-name" class="chord-name"></div>
+        <div id="prog-line" class="prog-line"></div>
+        <div class="chord-row">
+          <div></div>
+          <div id="chord-current" class="chord-current">
+            <div id="chord-name" class="chord-name"></div>
+            <div id="chord-numeral" class="chord-numeral"></div>
+          </div>
+          <div id="upcoming" class="upcoming"></div>
+        </div>
         <div id="check" class="check" aria-hidden="true">
           <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23"/><path d="M15 27 l7.5 7.5 L38 19"/></svg>
         </div>
@@ -482,7 +524,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     flats:   { label: 'Flats',      example: 'D♭ E♭ G♭ A♭ B♭' },
     flatsFs: { label: 'Flats + F♯', example: 'D♭ E♭ F♯ A♭ B♭' },
     sharps:  { label: 'Sharps',     example: 'C♯ D♯ F♯ G♯ A♯' },
-    both:    { label: 'Both',       example: 'sharp or flat, 50/50 each time' },
+    both:    { label: 'Both',       example: 'sharp or flat key, 50/50 per progression' },
   };
   const SPELLING_ORDER = ['flats', 'flatsFs', 'sharps', 'both'];
 
@@ -496,12 +538,15 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     return pick(opts);
   }
 
-  function makeChord(qualityId, pc, spelling = 'both') {
+  function chordFromRoot(qualityId, root) {
     const q = QUALITIES[qualityId];
+    return { root, quality: q, name: root.name + q.symbol, id: root.pc + '-' + q.id };
+  }
+
+  function makeChord(qualityId, pc, spelling = 'both') {
     if (pc == null) pc = Math.floor(Math.random() * 12);
     const [letter, acc] = rootSpelling(pc, spelling);
-    const root = makeRoot(letter, acc);
-    return { root, quality: q, name: root.name + q.symbol, id: root.pc + '-' + q.id };
+    return chordFromRoot(qualityId, makeRoot(letter, acc));
   }
 
   // Spell a chord degree as a note name, optionally with an octave for a MIDI number.
@@ -726,8 +771,88 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   });
   const TYPE_ORDER = ['shells', 'shells95', 'quartal', 'inversions', 'triads', 'drop2'];
 
+  /* ---------- Progressions ---------- */
+  // Each chord: [roman numeral, quality id, semitones above the key center]
+  const PROGRESSIONS = {
+    // 7th chords
+    majorIIVI:  { family: 'seventh', label: 'Major ii–V–I', tag: 'ii–V–I',
+                  chords: [['ii', 'm7', 2], ['V', 'dom7', 7], ['I', 'maj7', 0]] },
+    minorIIVI:  { family: 'seventh', label: 'Minor ii–V–i', tag: 'minor ii–V–i', minor: true,
+                  chords: [['ii', 'm7b5', 2], ['V', 'dom7', 7], ['i', 'm7', 0]] },
+    tritone:    { family: 'seventh', label: 'Tritone sub', tag: 'tritone sub',
+                  chords: [['ii', 'm7', 2], ['♭II', 'dom7', 1], ['I', 'maj7', 0]] },
+    backdoor:   { family: 'seventh', label: 'Backdoor ii–V', tag: 'backdoor',
+                  chords: [['iv', 'm7', 5], ['♭VII', 'dom7', 10], ['I', 'maj7', 0]] },
+    plagal7:    { family: 'seventh', label: 'Plagal cadence', tag: 'plagal (7ths)',
+                  chords: [['IV', 'maj7', 5], ['I', 'maj7', 0]] },
+    turnaround: { family: 'seventh', label: 'I–vi–ii–V turnaround', tag: 'I–vi–ii–V',
+                  chords: [['I', 'maj7', 0], ['vi', 'm7', 9], ['ii', 'm7', 2], ['V', 'dom7', 7]] },
+    // Triads (major keys)
+    authentic:  { family: 'triad', label: 'Authentic cadence', tag: 'V–I',
+                  chords: [['V', 'maj', 7], ['I', 'maj', 0]] },
+    plagal:     { family: 'triad', label: 'Plagal cadence', tag: 'IV–I',
+                  chords: [['IV', 'maj', 5], ['I', 'maj', 0]] },
+    deceptive:  { family: 'triad', label: 'Deceptive cadence', tag: 'V–vi',
+                  chords: [['V', 'maj', 7], ['vi', 'min', 9]] },
+    circle:     { family: 'triad', label: 'Circle of fifths', tag: 'circle of 5ths',
+                  chords: [['I', 'maj', 0], ['IV', 'maj', 5], ['vii°', 'dim', 11], ['iii', 'min', 4],
+                           ['vi', 'min', 9], ['ii', 'min', 2], ['V', 'maj', 7], ['I', 'maj', 0]] },
+    pop:        { family: 'triad', label: 'I–V–vi–IV', tag: 'I–V–vi–IV',
+                  chords: [['I', 'maj', 0], ['V', 'maj', 7], ['vi', 'min', 9], ['IV', 'maj', 5]] },
+    popMinor:   { family: 'triad', label: 'vi–IV–I–V', tag: 'vi–IV–I–V',
+                  chords: [['vi', 'min', 9], ['IV', 'maj', 5], ['I', 'maj', 0], ['V', 'maj', 7]] },
+    doowop:     { family: 'triad', label: 'I–vi–IV–V', tag: 'I–vi–IV–V',
+                  chords: [['I', 'maj', 0], ['vi', 'min', 9], ['IV', 'maj', 5], ['V', 'maj', 7]] },
+    oneFourFive:{ family: 'triad', label: 'I–IV–V', tag: 'I–IV–V',
+                  chords: [['I', 'maj', 0], ['IV', 'maj', 5], ['V', 'maj', 7]] },
+  };
+  const PROGRESSION_ORDER = Object.keys(PROGRESSIONS);
+
+  // 7th chords show their quality (ii−7, V7, Imaj7); triad numerals already imply it by case.
+  function numeralText(numeral, qid) {
+    const q = QUALITIES[qid];
+    return q.family === 'seventh' ? numeral + q.symbol : numeral;
+  }
+  const progressionNumerals = (id) =>
+    PROGRESSIONS[id].chords.map(([n, q]) => numeralText(n, q)).join(' – ');
+
+  const NUMERAL_STEP = { i: 0, ii: 1, iii: 2, iv: 3, v: 4, vi: 5, vii: 6 };
+
+  // Spell a chord root as a scale degree of the key (ii of B = C♯, ♭VII of C = B♭).
+  // Falls back to the plain spelling rule when that would give a double accidental
+  // or an awkward root like E♯, B♯, C♭ or F♭.
+  function degreeRoot(keyRoot, numeral, pc, spelling) {
+    const step = NUMERAL_STEP[numeral.replace(/[♭♯°]/g, '').toLowerCase()];
+    const letter = (keyRoot.letter + step) % 7;
+    let acc = mod12(pc - LETTER_PC[letter]);
+    if (acc > 6) acc -= 12;
+    const awkward = Math.abs(acc) > 1 || (acc !== 0 && !ROOT_SPELLINGS[pc].some(([l, a]) => l === letter && a === acc));
+    if (!awkward) return makeRoot(letter, acc);
+    const [l, a] = rootSpelling(pc, spelling);
+    return makeRoot(l, a);
+  }
+
+  // Spell a whole progression in one key. The spelling setting picks the key's
+  // spelling ("both" decides once per progression); chords follow the key.
+  function buildProgression(id, keyPc, spelling = 'both') {
+    const p = PROGRESSIONS[id];
+    if (keyPc == null) keyPc = Math.floor(Math.random() * 12);
+    if (spelling === 'both') spelling = pick(['sharps', 'flats']);
+    const keyRoot = makeChord('maj', keyPc, spelling).root;
+    return {
+      id,
+      label: p.label,
+      keyName: keyRoot.name + (p.minor ? ' minor' : ' major'),
+      chords: p.chords.map(([n, qid, offset]) => {
+        const pc = mod12(keyPc + offset);
+        return { chord: chordFromRoot(qid, degreeRoot(keyRoot, n, pc, spelling)), numeral: numeralText(n, qid) };
+      }),
+    };
+  }
+
   const Theory = {
     QUALITIES, QUALITY_ORDER, VOICING_TYPES, TYPE_ORDER, DEGREES, FAMILIES, SPELLINGS, SPELLING_ORDER,
+    PROGRESSIONS, PROGRESSION_ORDER, buildProgression, progressionNumerals,
     makeChord, spell, genericName, nameInChord, pcName, degreeLabel, quartalCandidates, mod12,
   };
 
@@ -1045,7 +1170,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   const MAX_LIVES = 3;
   const MIDI_SETTLE_MS = 250; // let a chord "land" before judging it wrong
   const ADVANCE_MS = 1100;
-  const FIFTH_MOVE_CHANCE = 0.75; // otherwise the next root is random
+  const LOOKAHEAD = 2; // upcoming chords shown after the current one
   const STORE_SETTINGS = 'voicingTrainer.settings.v1';
   const STORE_RUNS = 'voicingTrainer.runs.v1';
   const STORE_PAIRS = 'voicingTrainer.pairStats.v1';
@@ -1062,11 +1187,14 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   };
 
   const settings = Object.assign(
-    { types: ['shells'], qualities: ['maj7', 'm7', 'dom7'], mode: 'practice', input: 'screen', sound: true, filter: 'all', statsType: 'all', beat: true, bpm: 100, spelling: 'both' },
+    { types: ['shells'], progressions: null, mode: 'practice', input: 'screen', sound: true, filter: 'all', statsType: 'all', beat: true, bpm: 100, spelling: 'both' },
     store.get(STORE_SETTINGS, {})
   );
   settings.types = (settings.types || []).filter((t) => T.VOICING_TYPES[t]);
-  settings.qualities = (settings.qualities || []).filter((q) => T.QUALITIES[q]);
+  settings.progressions = Array.isArray(settings.progressions)
+    ? settings.progressions.filter((p) => T.PROGRESSIONS[p])
+    : [...T.PROGRESSION_ORDER];
+  delete settings.qualities; // replaced by progressions
   if (!T.SPELLINGS[settings.spelling]) settings.spelling = 'both';
   const saveSettings = () => store.set(STORE_SETTINGS, settings);
 
@@ -1098,8 +1226,9 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       fails: outcome === 'failed' ? 1 : 0,
     });
   }
-  const configKey = (types, qualities) =>
-    [...types].sort().join(',') + '|' + [...qualities].sort().join(',');
+  // Older runs stored chord qualities instead of progressions; they get their own key.
+  const runSet = (r) => (r.progressions ? r.progressions : (r.qualities || []).map((q) => 'q:' + q));
+  const configKey = (types, set) => [...types].sort().join(',') + '|' + [...set].sort().join(',');
 
   /* ---------- state ---------- */
   const midiHeld = new Set();
@@ -1155,26 +1284,25 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       typeList.appendChild(el);
     });
 
-    const qList = $('#quality-list');
-    qList.innerHTML = '';
+    const pList = $('#progression-list');
+    pList.innerHTML = '';
     const groups = {};
     Object.keys(T.FAMILIES).forEach((f) => {
-      qList.insertAdjacentHTML('beforeend', `<div class="chip-group"><div class="group-label">${T.FAMILIES[f]}</div><div class="chip-list" data-family="${f}"></div></div>`);
-      groups[f] = qList.querySelector(`[data-family="${f}"]`);
+      pList.insertAdjacentHTML('beforeend', `<div class="prog-group"><div class="group-label">${T.FAMILIES[f]}</div><div class="prog-list" data-family="${f}"></div></div>`);
+      groups[f] = pList.querySelector(`[data-family="${f}"]`);
     });
-    T.QUALITY_ORDER.forEach((id) => {
-      const q = T.QUALITIES[id];
+    T.PROGRESSION_ORDER.forEach((id) => {
+      const p = T.PROGRESSIONS[id];
       const el = document.createElement('label');
-      el.className = 'chip';
-      el.title = q.label;
-      el.innerHTML = `<input type="checkbox" value="${id}"><span>C${q.symbol}</span>`;
+      el.className = 'prog-chip';
+      el.innerHTML = `<input type="checkbox" value="${id}"><span><b>${p.label}</b><small>${T.progressionNumerals(id)}</small></span>`;
       const input = el.querySelector('input');
-      input.checked = settings.qualities.includes(id);
+      input.checked = settings.progressions.includes(id);
       input.addEventListener('change', () => {
-        settings.qualities = T.QUALITY_ORDER.filter((x) => qList.querySelector(`input[value="${x}"]`).checked);
+        settings.progressions = T.PROGRESSION_ORDER.filter((x) => pList.querySelector(`input[value="${x}"]`).checked);
         saveSettings(); renderScores(); renderComboNote(); $('#menu-error').textContent = '';
       });
-      groups[q.family].appendChild(el);
+      groups[p.family].appendChild(el);
     });
 
     const spSeg = $('#spelling-seg');
@@ -1275,24 +1403,24 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   }
 
   function renderSpellingDesc() {
-    $('#spelling-desc').textContent = 'Black-key roots: ' + T.SPELLINGS[settings.spelling].example;
+    $('#spelling-desc').textContent = 'Black-key keys: ' + T.SPELLINGS[settings.spelling].example + '. Chords are spelled to fit the key.';
   }
 
   // Voicing types only apply to their chord family (7th chords vs triads).
   function usableSelection() {
     const types = settings.types.filter((t) =>
-      settings.qualities.some((q) => T.QUALITIES[q].family === T.VOICING_TYPES[t].family));
-    const qualities = settings.qualities.filter((q) =>
-      types.some((t) => T.VOICING_TYPES[t].family === T.QUALITIES[q].family));
-    return { types, qualities };
+      settings.progressions.some((p) => T.PROGRESSIONS[p].family === T.VOICING_TYPES[t].family));
+    const progressions = settings.progressions.filter((p) =>
+      types.some((t) => T.VOICING_TYPES[t].family === T.PROGRESSIONS[p].family));
+    return { types, progressions };
   }
 
   function renderComboNote() {
-    const words = { seventh: ['7th-chord voicings', '7th chords'], triad: ['triad voicings', 'triads'] };
+    const words = { seventh: ['7th-chord voicings', '7th-chord progressions'], triad: ['triad voicings', 'triad progressions'] };
     const parts = [];
     Object.keys(T.FAMILIES).forEach((f) => {
       const hasType = settings.types.some((t) => T.VOICING_TYPES[t].family === f);
-      const hasQual = settings.qualities.some((q) => T.QUALITIES[q].family === f);
+      const hasQual = settings.progressions.some((p) => T.PROGRESSIONS[p].family === f);
       if (hasType && !hasQual) parts.push(`${words[f][0]} are picked but no ${words[f][1]}`);
       if (hasQual && !hasType) parts.push(`${words[f][1]} are picked but no ${words[f][0]}`);
     });
@@ -1360,16 +1488,19 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   function stopMidiVoices() { midiVoices.forEach((v) => Sound.noteOff(v)); midiVoices.clear(); }
 
   /* ---------- scores ---------- */
-  function tagsHTML(types, qualities) {
+  function tagsHTML(types, set) {
     return types.map((t) => `<span class="tag">${T.VOICING_TYPES[t] ? T.VOICING_TYPES[t].label : t}</span>`).join('') +
-      qualities.map((q) => `<span class="tag q">${T.QUALITIES[q] ? T.QUALITIES[q].tag : q}</span>`).join('');
+      set.map((x) => {
+        if (x.startsWith('q:')) { const q = T.QUALITIES[x.slice(2)]; return `<span class="tag q">${q ? q.tag : x.slice(2)}</span>`; }
+        return `<span class="tag q">${T.PROGRESSIONS[x] ? T.PROGRESSIONS[x].tag : x}</span>`;
+      }).join('');
   }
 
   function renderScores() {
     let runs = loadRuns();
     if (settings.filter === 'setup') {
-      const key = configKey(settings.types, settings.qualities);
-      runs = runs.filter((r) => configKey(r.types, r.qualities) === key);
+      const key = configKey(settings.types, settings.progressions);
+      runs = runs.filter((r) => configKey(r.types, runSet(r)) === key);
     }
     const table = $('#score-table');
     const chart = $('#history-chart');
@@ -1400,7 +1531,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     const top = [...runs].sort((a, b) => b.score - a.score || new Date(b.date) - new Date(a.date)).slice(0, 10);
     table.innerHTML = '<tr><th>#</th><th>Score</th><th>Voicings · chords</th><th>Date</th></tr>' +
       top.map((r, i) => `<tr><td class="rank">${i + 1}</td><td class="score">${r.score}</td>
-        <td>${tagsHTML(r.types, r.qualities)}</td>
+        <td>${tagsHTML(r.types, runSet(r))}</td>
         <td class="date">${new Date(r.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</td></tr>`).join('');
   }
 
@@ -1478,10 +1609,10 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   function startRun() {
     Sound.unlock();
     if (!settings.types.length) { $('#menu-error').textContent = 'Pick at least one voicing type.'; return; }
-    if (!settings.qualities.length) { $('#menu-error').textContent = 'Pick at least one chord quality.'; return; }
+    if (!settings.progressions.length) { $('#menu-error').textContent = 'Pick at least one progression.'; return; }
     const usable = usableSelection();
     if (!usable.types.length) {
-      $('#menu-error').textContent = 'None of the selected voicings fit the selected chords. Triad voicings need triads, 7th-chord voicings need 7th chords.';
+      $('#menu-error').textContent = 'None of the selected voicings fit the selected progressions. Triad voicings need triad progressions, 7th-chord voicings need 7th-chord progressions.';
       return;
     }
     if (settings.input === 'midi') connectMidi();
@@ -1489,8 +1620,9 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     run = {
       mode: settings.mode,
       types: usable.types,
-      qualities: usable.qualities,
+      progressions: usable.progressions,
       spelling: settings.spelling,
+      queue: [], progCount: 0,
       score: 0, correct: 0, streak: 0, bestStreak: 0, hints: 0, mistakes: 0, skips: 0,
       lives: MAX_LIVES, over: false, startedAt: Date.now(),
       prompt: null, solved: false, armed: true, wrong: false, hintShown: false, hintIndex: 0,
@@ -1510,25 +1642,30 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     evalTimer = advanceTimer = null;
   }
 
-  const pickQuality = (type) => pick(run.qualities.filter((q) => T.QUALITIES[q].family === type.family));
+  // Pick a voicing type, then a progression it can voice, in a random key.
+  function enqueueProgression() {
+    const type = T.VOICING_TYPES[pick(run.types)];
+    const id = pick(run.progressions.filter((p) => T.PROGRESSIONS[p].family === type.family));
+    // Don't start on the same chord the previous progression ends on.
+    const last = run.queue.length ? run.queue[run.queue.length - 1] : run.prompt;
+    let prog, tries = 0;
+    do prog = T.buildProgression(id, null, run.spelling);
+    while (last && prog.chords[0].chord.id === last.chord.id && ++tries < 20);
+    const seq = ++run.progCount;
+    prog.chords.forEach((c, i) => run.queue.push({
+      chord: c.chord, numeral: c.numeral, type, prog, step: i, seq,
+    }));
+  }
 
   function nextPrompt() {
     clearTimers();
     screenHeld.clear();
-    let chord, type, tries = 0;
-    const prev = run.prompt;
-    if (prev && Math.random() < FIFTH_MOVE_CHANCE) {
-      // Down a fifth (C → F → B♭ …), like a ii–V–I / cycle progression
-      type = T.VOICING_TYPES[pick(run.types)];
-      chord = T.makeChord(pickQuality(type), (prev.chord.root.pc + 5) % 12, run.spelling);
-    } else {
-      do {
-        type = T.VOICING_TYPES[pick(run.types)];
-        chord = T.makeChord(pickQuality(type), null, run.spelling);
-      } while (prev && chord.id === prev.chord.id && type.id === prev.type.id && ++tries < 20);
-    }
+    if (!run.queue.length) enqueueProgression();
+    const item = run.queue.shift();
+    while (run.queue.length < LOOKAHEAD) enqueueProgression();
+    const { chord, type } = item;
 
-    run.prompt = { chord, type, options: type.options(chord), mistakes: 0, hinted: false, recorded: false };
+    run.prompt = { ...item, options: type.options(chord), mistakes: 0, hinted: false, recorded: false };
     run.solved = false;
     run.wrong = false;
     run.hintShown = false;
@@ -1536,14 +1673,34 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     // If the previous chord is still held down, wait for a release before judging.
     run.armed = heldNotes().length < type.noteCount;
 
-    $('#prompt-type').innerHTML = `<b>${type.label}</b> · ${type.long}`;
-    const cn = $('#chord-name');
-    cn.className = 'chord-name';
-    cn.innerHTML = chordHTML(chord.name, chord.quality.symbol);
+    renderPrompt();
     $('#hint-text').innerHTML = '';
     renderStats();
     renderHintButton();
     renderKeyboard();
+  }
+
+  function renderPrompt() {
+    const p = run.prompt;
+    $('#prompt-type').innerHTML = `<b>${p.type.label}</b> · ${p.type.long}`;
+    $('#prog-line').innerHTML = `${p.prog.label} in <b>${p.prog.keyName}</b> · chord ${p.step + 1} of ${p.prog.chords.length}`;
+    const cn = $('#chord-name');
+    cn.className = 'chord-name';
+    cn.innerHTML = chordHTML(p.chord.name, p.chord.quality.symbol);
+    $('#chord-numeral').textContent = p.numeral;
+    const wrap = $('#chord-current');
+    wrap.classList.remove('enter');
+    void wrap.offsetWidth;
+    wrap.classList.add('enter');
+
+    $('#upcoming').innerHTML = '<div class="up-label">Next</div>' + run.queue.slice(0, LOOKAHEAD).map((u) => {
+      const fresh = u.seq !== p.seq;
+      const note = fresh && u.step === 0
+        ? `<div class="up-new">${u.prog.label} · ${u.prog.keyName}${u.type.id !== p.type.id ? ` · ${u.type.label}` : ''}</div>` : '';
+      return `<div class="up${fresh && u.step === 0 ? ' new' : ''}">${note}
+        <div class="up-name">${chordHTML(u.chord.name, u.chord.quality.symbol)}</div>
+        <div class="up-num">${u.numeral}</div></div>`;
+    }).join('');
   }
 
   function onNotesChanged(source) {
@@ -1681,15 +1838,15 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
 
   function endRun() {
     const runs = loadRuns();
-    const key = configKey(run.types, run.qualities);
-    const prevSame = runs.filter((r) => configKey(r.types, r.qualities) === key);
+    const key = configKey(run.types, run.progressions);
+    const prevSame = runs.filter((r) => configKey(r.types, runSet(r)) === key);
     const bestSame = prevSame.reduce((m, r) => Math.max(m, r.score), 0);
     const bestAll = runs.reduce((m, r) => Math.max(m, r.score), 0);
     runs.push({
       score: run.score,
       date: new Date().toISOString(),
       types: run.types,
-      qualities: run.qualities,
+      progressions: run.progressions,
       hints: run.hints,
       mistakes: run.mistakes,
       bestStreak: run.bestStreak,
@@ -1707,7 +1864,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     const secs = Math.round(((Date.now() - run.startedAt) / 1000) % 60);
     $('#result-detail').innerHTML = `
       <div>Previous best for this setup: <b>${prevSame.length ? bestSame : 'none'}</b> · Longest streak: <b>${run.bestStreak}</b> · Time: ${mins}:${String(secs).padStart(2, '0')}</div>
-      <div class="tags">${tagsHTML(run.types, run.qualities)}</div>`;
+      <div class="tags">${tagsHTML(run.types, run.progressions)}</div>`;
     run = null;
     syncBacking();
     showView('results');
