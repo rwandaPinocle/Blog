@@ -295,6 +295,28 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
 .prog-chip b i { font-weight: 400; font-style: normal; color: var(--muted); }
 #voicing-setup > h2:first-child, #scale-setup > h2:first-child { margin-top: 22px; }
 
+/* Key-center picker */
+.key-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.key-list { display: grid; grid-template-columns: repeat(12, minmax(34px, 1fr)); gap: 5px; flex: 1 1 420px; }
+.key-quick { display: flex; gap: 6px; }
+.key-chip { cursor: pointer; }
+.key-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.key-chip span {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40px; padding: 3px 2px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); font-family: var(--serif);
+  font-weight: 600; font-size: .95rem; line-height: 1.1; transition: all .15s;
+}
+.key-chip span small { font-size: .72rem; font-weight: 400; color: var(--muted); }
+.key-chip input:checked + span { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); color: var(--accent); }
+.key-chip input:focus-visible + span { outline: 2px solid var(--held); outline-offset: 2px; }
+@media (max-width: 560px) { .key-list { grid-template-columns: repeat(6, 1fr); } }
+
+/* Progression success: 12 key columns plus an "All" column */
+.hm-grid.with-all { grid-template-columns: auto repeat(12, minmax(22px, 1fr)) minmax(30px, 1.2fr); }
+.hm-grid .hm-all { margin-left: 4px; }
+.hm-grid .hm-col.all { margin-left: 4px; font-weight: 700; }
+.muted { color: var(--muted); font-weight: 400; }
+
 </style>
 </head>
 <body>
@@ -327,6 +349,16 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
           <p class="sub" id="order-desc"></p>
           <div id="progression-list" class="prog-groups"></div>
           <p class="sub warn" id="combo-note"></p>
+
+          <h2 id="keys-title">Key centers</h2>
+          <div class="key-row">
+            <div id="key-list" class="key-list"></div>
+            <div class="key-quick">
+              <button type="button" class="btn ghost small" id="keys-all">All</button>
+              <button type="button" class="btn ghost small" id="keys-none">None</button>
+            </div>
+          </div>
+          <p class="sub" id="keys-desc"></p>
           </div>
 
           <div id="scale-setup" hidden>
@@ -394,6 +426,16 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
           <div id="heatmap" class="heatmap"></div>
           <div class="table-wrap"><table id="trouble-table"></table></div>
           <button id="clear-stats" class="btn ghost small">Reset stats</button>
+        </div>
+
+        <div class="card prog-stats">
+          <div class="scores-head">
+            <h2>Progression success</h2>
+          </div>
+          <div class="seg small" id="prog-stats-seg"></div>
+          <div id="prog-heatmap" class="heatmap"></div>
+          <div class="table-wrap"><table id="prog-table"></table></div>
+          <button id="clear-prog-stats" class="btn ghost small">Reset progression stats</button>
         </div>
         </div>
       </div>
@@ -599,6 +641,11 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
 
   const rel = (midi, chord) => mod12(midi - chord.root.pc);
   const pcName = (pc) => GENERIC[mod12(pc)];
+  // [main, alternate] names for a pitch class: ['D♭', 'C♯'], or ['C'].
+  const pcNames = (pc) => {
+    const opts = ROOT_SPELLINGS[mod12(pc)].map(([l, a]) => LETTERS[l] + ACC[a]);
+    return opts.length > 1 ? [opts[1], opts[0]] : opts;
+  };
 
   // Name a played note using the chord's spelling when it's a chord/scale tone.
   function nameInChord(chord, midi) {
@@ -872,6 +919,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     const keyRoot = makeChord('maj', keyPc, spelling).root;
     return {
       id,
+      keyPc,
       label: p.label,
       keyName: keyRoot.name + (p.minor ? ' minor' : ' major'),
       chords: p.chords.map(([n, qid, offset]) => {
@@ -962,7 +1010,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     QUALITIES, QUALITY_ORDER, VOICING_TYPES, TYPE_ORDER, DEGREES, FAMILIES, SPELLINGS, SPELLING_ORDER,
     PROGRESSIONS, PROGRESSION_ORDER, buildProgression, progressionNumerals,
     SCALES, SCALE_ORDER, SCALE_GROUPS, DIRECTIONS, makeScale, scaleRun, scaleNoteName,
-    makeChord, spell, genericName, nameInChord, pcName, degreeLabel, quartalCandidates, mod12,
+    makeChord, spell, genericName, nameInChord, pcName, pcNames, degreeLabel, quartalCandidates, mod12,
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = Theory;
@@ -1283,6 +1331,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   const STORE_SETTINGS = 'voicingTrainer.settings.v1';
   const STORE_RUNS = 'voicingTrainer.runs.v1';
   const STORE_PAIRS = 'voicingTrainer.pairStats.v1';
+  const STORE_PROGS = 'voicingTrainer.progStats.v1';
 
   /* ---------- storage ---------- */
   const store = {
@@ -1296,7 +1345,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   };
 
   const settings = Object.assign(
-    { types: ['shells'], progressions: null, mode: 'practice', input: 'screen', sound: true, filter: 'all', statsType: 'all', beat: true, bpm: 100, spelling: 'both', order: 'progressions', practice: 'voicings', scales: null, scaleDir: 'both' },
+    { types: ['shells'], progressions: null, mode: 'practice', input: 'screen', sound: true, filter: 'all', statsType: 'all', progStatsType: 'all', beat: true, bpm: 100, spelling: 'both', order: 'progressions', practice: 'voicings', scales: null, scaleDir: 'both', keys: null },
     store.get(STORE_SETTINGS, {})
   );
   settings.types = (settings.types || []).filter((t) => T.VOICING_TYPES[t]);
@@ -1309,6 +1358,9 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   if (settings.practice !== 'scales') settings.practice = 'voicings';
   settings.scales = Array.isArray(settings.scales) ? settings.scales.filter((x) => T.SCALES[x]) : [...T.SCALE_ORDER];
   if (!['up', 'down', 'both'].includes(settings.scaleDir)) settings.scaleDir = 'both';
+  const ALL_KEYS = Array.from({ length: 12 }, (_, i) => i);
+  settings.keys = Array.isArray(settings.keys)
+    ? ALL_KEYS.filter((k) => settings.keys.includes(k)) : [...ALL_KEYS];
   const saveSettings = () => store.set(STORE_SETTINGS, settings);
 
   const loadRuns = () => store.get(STORE_RUNS, []);
@@ -1332,6 +1384,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     if (!p || p.recorded) return;
     if (outcome === 'quit' && !p.mistakes && !p.hinted) return; // untouched prompt, don't count
     p.recorded = true;
+    trackProg(p, outcome);
     bumpPair(p, {
       attempts: 1,
       clean: outcome === 'solved' && !p.mistakes && !p.hinted ? 1 : 0,
@@ -1339,15 +1392,55 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       fails: outcome === 'failed' ? 1 : 0,
     });
   }
+  /* ---------- per progression / key center / voicing stats ---------- */
+  // key "progId|keyPc|typeId" -> counts. One attempt per progression played (or abandoned after a slip).
+  // Clean = every chord played with no mistakes, hints or skips.
+  let progStats = store.get(STORE_PROGS, {});
+  const emptyProg = () => ({ attempts: 0, clean: 0, completed: 0, mistakes: 0, hints: 0, skips: 0, fails: 0 });
+
+  function trackProg(p, outcome) {
+    if (!p.prog) return;
+    let t = run.progTrack;
+    if (!t || t.seq !== p.seq) {
+      t = run.progTrack = { seq: p.seq, key: `${p.prog.id}|${p.prog.keyPc}|${p.type.id}`, mistakes: 0, hints: 0, skips: 0, failed: false };
+    }
+    t.mistakes += p.mistakes;
+    t.hints += p.hinted ? 1 : 0;
+    t.skips += outcome === 'skip' ? 1 : 0;
+    t.failed = t.failed || outcome === 'failed';
+    const done = p.step === p.prog.chords.length - 1;
+    if (done || outcome === 'failed' || outcome === 'quit') saveProg(done && outcome !== 'failed');
+  }
+
+  // Close out the progression in progress. Abandoned ones only count if something went wrong.
+  function saveProg(completed) {
+    const t = run && run.progTrack;
+    if (!t) return;
+    run.progTrack = null;
+    const slipped = t.mistakes || t.hints || t.skips || t.failed;
+    if (!completed && !slipped) return;
+    const s = progStats[t.key] || (progStats[t.key] = emptyProg());
+    s.attempts++;
+    if (completed) s.completed++;
+    if (completed && !slipped) s.clean++;
+    s.mistakes += t.mistakes;
+    s.hints += t.hints;
+    s.skips += t.skips;
+    if (t.failed) s.fails++;
+    store.set(STORE_PROGS, progStats);
+  }
+
   // Older runs stored chord qualities instead of progressions; they get their own key.
   // Scale runs: the scale ids plus the direction setting.
   const scaleSet = (scales, dir) => [...scales.map((x) => 's:' + x), 'dir:' + dir];
+  // Voicing runs limited to some key centers are grouped separately ("keys:0,5,10").
+  const keysTag = (keys) => (keys && keys.length < 12 ? ['keys:' + [...keys].sort((a, b) => a - b).join(',')] : []);
   const runSet = (r) => (r.kind === 'scales' ? scaleSet(r.scales, r.dir)
-    : r.order === 'random' ? ['random']
-    : r.progressions ? r.progressions : (r.qualities || []).map((q) => 'q:' + q));
+    : [...(r.order === 'random' ? ['random']
+      : r.progressions ? r.progressions : (r.qualities || []).map((q) => 'q:' + q)), ...keysTag(r.keys)]);
   const currentTypes = () => (settings.practice === 'scales' ? ['scales'] : settings.types);
   const currentSet = () => (settings.practice === 'scales' ? scaleSet(settings.scales, settings.scaleDir)
-    : settings.order === 'random' ? ['random'] : settings.progressions);
+    : [...(settings.order === 'random' ? ['random'] : settings.progressions), ...keysTag(settings.keys)]);
   const configKey = (types, set) => [...types].sort().join(',') + '|' + [...set].sort().join(',');
 
   /* ---------- state ---------- */
@@ -1365,7 +1458,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   /* ---------- views ---------- */
   function showView(name) {
     ['menu', 'play', 'results'].forEach((v) => { $('#view-' + v).hidden = v !== name; });
-    if (name === 'menu') { renderScores(); renderTrouble(); }
+    if (name === 'menu') { renderScores(); renderTrouble(); renderProgStats(); }
     window.scrollTo(0, 0);
   }
 
@@ -1425,6 +1518,23 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       groups[p.family].appendChild(el);
     });
 
+    const kList = $('#key-list');
+    kList.innerHTML = ALL_KEYS.map((pc) => {
+      const [a, b] = T.pcNames(pc);
+      return `<label class="key-chip"><input type="checkbox" value="${pc}"><span>${a}${b ? `<small>${b}</small>` : ''}</span></label>`;
+    }).join('');
+    const syncKeys = () => {
+      kList.querySelectorAll('input').forEach((i) => { i.checked = settings.keys.includes(+i.value); });
+      saveSettings(); renderKeysDesc(); renderScores(); $('#menu-error').textContent = '';
+    };
+    kList.addEventListener('change', () => {
+      settings.keys = ALL_KEYS.filter((pc) => kList.querySelector(`input[value="${pc}"]`).checked);
+      syncKeys();
+    });
+    $('#keys-all').addEventListener('click', () => { settings.keys = [...ALL_KEYS]; syncKeys(); });
+    $('#keys-none').addEventListener('click', () => { settings.keys = []; syncKeys(); });
+    kList.querySelectorAll('input').forEach((i) => { i.checked = settings.keys.includes(+i.value); });
+
     const sList = $('#scale-list');
     sList.innerHTML = '';
     const sGroups = {};
@@ -1481,6 +1591,19 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
         pairStats = {};
         store.set(STORE_PAIRS, pairStats);
         renderTrouble();
+      }
+    });
+
+    const pseg = $('#prog-stats-seg');
+    pseg.innerHTML = [['all', 'All voicings'], ...T.TYPE_ORDER.map((t) => [t, T.VOICING_TYPES[t].label])]
+      .map(([v, l]) => `<label><input type="radio" name="progStatsType" value="${v}"><span>${l}</span></label>`).join('');
+    if (settings.progStatsType !== 'all' && !T.VOICING_TYPES[settings.progStatsType]) settings.progStatsType = 'all';
+    bindSeg('progStatsType', settings.progStatsType, (v) => { settings.progStatsType = v; saveSettings(); renderProgStats(); });
+    $('#clear-prog-stats').addEventListener('click', () => {
+      if (Object.keys(progStats).length && confirm('Reset all progression success stats?')) {
+        progStats = {};
+        store.set(STORE_PROGS, progStats);
+        renderProgStats();
       }
     });
 
@@ -1569,6 +1692,17 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       : 'Each progression is played start to finish in a random key, then a new one is picked.';
     renderComboNote();
     renderSpellingDesc();
+    renderKeysDesc();
+  }
+
+  function renderKeysDesc() {
+    const random = settings.order === 'random';
+    $('#keys-title').textContent = random ? 'Roots' : 'Key centers';
+    const n = settings.keys.length;
+    $('#keys-desc').textContent = !n ? (random ? 'Pick at least one root.' : 'Pick at least one key.')
+      : random
+        ? (n === 12 ? 'Chords can land on any of the 12 roots.' : `Chords are built only on these ${n === 1 ? 'root' : n + ' roots'}.`)
+        : (n === 12 ? 'Each progression starts in a random key from all 12.' : `Each progression is played in one of ${n === 1 ? 'this key' : 'these ' + n + ' keys'}. Minor progressions use it as the minor tonic.`);
   }
 
   function renderPractice() {
@@ -1684,6 +1818,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     return types.map((t) => `<span class="tag">${t === 'scales' ? 'Scales' : T.VOICING_TYPES[t] ? T.VOICING_TYPES[t].label : t}</span>`).join('') +
       set.map((x) => {
         if (x === 'random') return '<span class="tag q">random chords</span>';
+        if (x.startsWith('keys:')) return `<span class="tag q">keys: ${x.slice(5).split(',').map((k) => T.pcName(+k)).join(' ')}</span>`;
         if (x === 'g:all') return '<span class="tag q">all scales</span>';
         if (x.startsWith('g:')) return `<span class="tag q">${{ modes: 'all modes', pent: 'pentatonic & blues', sym: 'symmetric' }[x.slice(2)]}</span>`;
         if (x.startsWith('s:')) return `<span class="tag q">${T.SCALES[x.slice(2)] ? T.SCALES[x.slice(2)].tag : x.slice(2)}</span>`;
@@ -1810,6 +1945,58 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       : '<tr><td class="empty">Everything you’ve played so far was clean. Nice.</td></tr>';
   }
 
+  function renderProgStats() {
+    const sel = settings.progStatsType;
+    const byCell = {};   // progId|pc -> counts, across voicing types (or for the selected one)
+    const rows = [];     // individual progression/key/voicing combos
+    Object.entries(progStats).forEach(([key, s]) => {
+      const [pid, pc, tid] = key.split('|');
+      const prog = T.PROGRESSIONS[pid], type = T.VOICING_TYPES[tid];
+      if (!prog || !type || (sel !== 'all' && tid !== sel)) return;
+      [pid + '|' + pc, pid + '|all'].forEach((k) => {
+        const agg = byCell[k] || (byCell[k] = emptyProg());
+        Object.keys(agg).forEach((f) => { agg[f] += s[f] || 0; });
+      });
+      rows.push({ prog, pc: +pc, type, s });
+    });
+
+    const hm = $('#prog-heatmap');
+    const table = $('#prog-table');
+    if (!rows.length) {
+      hm.innerHTML = '';
+      table.innerHTML = '<tr><td class="empty">No data yet. Play through some progressions in either mode.</td></tr>';
+      return;
+    }
+
+    const rate = (s) => s.clean / s.attempts;
+    const keyName = (prog, pc) => T.pcName(pc) + (prog.minor ? ' minor' : '');
+    const cell = (prog, pc) => {
+      const s = byCell[prog.id + '|' + pc];
+      const where = pc === 'all' ? 'all keys' : keyName(prog, pc);
+      const cls = pc === 'all' ? ' hm-all' : '';
+      if (!s || !s.attempts) return `<div class="hm-cell none${cls}" title="${prog.label} in ${where}: not played yet"></div>`;
+      const tip = `${prog.label} in ${where}: ${s.clean}/${s.attempts} clean · ${s.mistakes} mistakes, ${s.hints} hints, ${s.skips} skips`;
+      return `<div class="hm-cell${cls}" style="background:${heatColor(1 - rate(s))}" title="${tip}">${Math.round(rate(s) * 100)}</div>`;
+    };
+    const fam = sel === 'all' ? null : T.VOICING_TYPES[sel].family;
+    const progs = T.PROGRESSION_ORDER.map((id) => ({ ...T.PROGRESSIONS[id], id }))
+      .filter((p) => (!fam || p.family === fam) && byCell[p.id + '|all']);
+    hm.innerHTML = '<div class="hm-grid with-all"><div></div>' +
+      Array.from({ length: 12 }, (_, pc) => `<div class="hm-col">${T.pcName(pc)}</div>`).join('') + '<div class="hm-col all">All</div>' +
+      progs.map((p) => `<div class="hm-row" title="${p.label}">${p.tag}</div>` +
+        Array.from({ length: 12 }, (_, pc) => cell(p, pc)).join('') + cell(p, 'all')).join('') +
+      '</div>' +
+      `<div class="hm-scale"><span>0%</span><i style="background:linear-gradient(to right, ${[1, 0.75, 0.5, 0.25, 0].map(heatColor).join(', ')})"></i><span>100%</span></div>` +
+      '<p class="sub hm-legend">Number = % of times the whole progression was played clean (no mistakes, hints or skips) in that key. Hover for counts.</p>';
+
+    const weakest = rows.filter((r) => r.s.attempts)
+      .sort((a, b) => rate(a.s) - rate(b.s) || b.s.attempts - a.s.attempts)
+      .slice(0, 8);
+    table.innerHTML = '<tr><th>Progression</th><th>Key</th><th>Voicing</th><th>Success</th></tr>' +
+      weakest.map((r) => `<tr><td>${r.prog.label}</td><td class="chord">${keyName(r.prog, r.pc)}</td><td>${r.type.label}</td>
+        <td class="date">${Math.round(rate(r.s) * 100)}% <span class="muted">(${r.s.clean}/${r.s.attempts})</span></td></tr>`).join('');
+  }
+
   /* ================= PLAY ================= */
 
   function startRun() {
@@ -1817,6 +2004,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     if (settings.practice === 'scales') { startScaleRun(); return; }
     if (!settings.types.length) { $('#menu-error').textContent = 'Pick at least one voicing type.'; return; }
     if (settings.order !== 'random' && !settings.progressions.length) { $('#menu-error').textContent = 'Pick at least one progression.'; return; }
+    if (!settings.keys.length) { $('#menu-error').textContent = settings.order === 'random' ? 'Pick at least one root.' : 'Pick at least one key center.'; return; }
     const usable = usableSelection();
     if (!usable.types.length) {
       $('#menu-error').textContent = 'None of the selected voicings fit the selected progressions. Triad voicings need triad progressions, 7th-chord voicings need 7th-chord progressions.';
@@ -1830,6 +2018,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
       types: usable.types,
       progressions: usable.progressions,
       order: settings.order,
+      keys: [...settings.keys],
       spelling: settings.spelling,
       queue: [], progCount: 0,
       score: 0, correct: 0, streak: 0, bestStreak: 0, hints: 0, mistakes: 0, skips: 0,
@@ -1893,7 +2082,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
   function enqueueRandomChord() {
     const type = T.VOICING_TYPES[pick(run.types)];
     const qid = pick(T.QUALITY_ORDER.filter((q) => T.QUALITIES[q].family === type.family));
-    run.queue.push({ chord: T.makeChord(qid, null, run.spelling), numeral: '', type, prog: null, step: 0, seq: ++run.progCount });
+    run.queue.push({ chord: T.makeChord(qid, pick(run.keys), run.spelling), numeral: '', type, prog: null, step: 0, seq: ++run.progCount });
   }
 
   // Pick a voicing type, then a progression it can voice, in a random key.
@@ -1903,7 +2092,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     // Don't start on the same chord the previous progression ends on.
     const last = run.queue.length ? run.queue[run.queue.length - 1] : run.prompt;
     let prog, tries = 0;
-    do prog = T.buildProgression(id, null, run.spelling);
+    do prog = T.buildProgression(id, pick(run.keys), run.spelling);
     while (last && prog.chords[0].chord.id === last.chord.id && ++tries < 20);
     const seq = ++run.progCount;
     prog.chords.forEach((c, i) => run.queue.push({
@@ -2191,7 +2380,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     const runs = loadRuns();
     const rec = run.kind === 'scales'
       ? { kind: 'scales', types: ['scales'], scales: run.scales, dir: run.dir }
-      : { types: run.types, progressions: run.progressions, order: run.order };
+      : { types: run.types, progressions: run.progressions, order: run.order, keys: run.keys };
     const runKeySet = runSet(rec);
     const key = configKey(rec.types, runKeySet);
     const prevSame = runs.filter((r) => configKey(r.types, runSet(r)) === key);
@@ -2228,6 +2417,7 @@ td.chord { font-family: var(--serif); font-size: 1rem; white-space: nowrap; }
     if (run && run.mode === 'gauntlet' && !run.over && run.score > 0 &&
         !confirm('Quit this run? It won’t be saved to your high scores.')) return;
     if (run && !run.solved) finishPrompt('quit');
+    if (run) saveProg(false);
     clearTimers();
     run = null;
     syncBacking();
